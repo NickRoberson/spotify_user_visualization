@@ -1,7 +1,7 @@
 var client_id = "85f22cf5c62d45a5850c744d876fc4a0";
 var client_secret = "ee25f76fe69e4418adbf136ac8dfce32";
 var redirect_uri = "http://localhost:8000/login_page.html";
-var scopes = 'user-read-private user-read-email';
+var scopes = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative';
 var base_url = 'https://accounts.spotify.com/authorize';
 var url;
 var stateKey = 'spotify_auth_state';
@@ -13,6 +13,7 @@ function authorize_user() {
           var access_token = params.access_token,
               state = params.state,
               storedState = localStorage.getItem(stateKey);
+          sessionStorage.setItem('OAuth',access_token);
           if (access_token && (state == null || state !== storedState)) {
             alert('There was an error during the authentication');
           } else {
@@ -26,13 +27,14 @@ function authorize_user() {
                   success: function(response) {
                     //userProfilePlaceholder.innerHTML = userProfileTemplate(response);
                     console.log(response);
-                    //$('#login').hide();
-                    //$('#loggedin').show();
+                    sessionStorage.setItem('user',JSON.stringify(response));
+                    console.log(JSON.parse(sessionStorage.getItem('user')));
+                    $('#nav_button').show();
+                    $('#login-button').hide();
                   }
               });
             } else {
-                $('#login').show();
-                $('#loggedin').hide();
+                console.log("Could not authenticate.");
             }
   url = base_url + '?' + $.param({
     'response_type' : 'code',
