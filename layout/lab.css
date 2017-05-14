@@ -1,0 +1,19 @@
+.standard-padding {
+  margin: 10px 10px 10px 10px;
+}
+
+.center {
+    margin: auto;
+    width: 20%;
+    padding: 100px 0px 0px 0px;
+}
+
+.facebook-blue {
+    background-color: #3b5998;
+    color: white;
+}
+
+.border-bottom-color {
+  border-bottom: 1px solid;
+  border-color: #adadad;
+}
