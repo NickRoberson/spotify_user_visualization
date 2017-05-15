@@ -1,4 +1,4 @@
-var listPlaylists = function() {
+function listPlaylists() {
   var base_url = "https://api.spotify.com/v1/users/" + user.id + "/playlists";
   var playlists;
   var call_url = base_url + '?' + $.param({

@@ -31,6 +31,11 @@ function authorize_user() {
                     console.log(JSON.parse(sessionStorage.getItem('user')));
                     $('#nav_button').show();
                     $('#login-button').hide();
+                    var message = document.getElementById('message_login_screen');
+                    message.innerHTML = "Hello, " + response.display_name  + ".";
+                    var user_image = document.getElementById("user_image");
+                    user_image.src = response.images[0].url;
+                    $('#user_image').show();
                   }
               });
             } else {
