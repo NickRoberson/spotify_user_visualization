@@ -5,6 +5,8 @@
     <title>Spotify Visualization</title>
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="lab.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <!-- IMPORT BOOTSTRAP -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -14,13 +16,32 @@
     <script src="http://d3js.org/topojson.v1.min.js"></script>
   </head>
 
-  <body class="standard-padding">
+  <body class="standard-padding main-page-theme">
+    <script type="text/javascript" src="src/api_calls.js"></script>
     <script type="text/javascript" src="src/main.js"></script>
-    <!-- HEADER & BREADCRUMB -->
-      <h1>Spotify User Visualization <small>Nick Roberson and Jonghoon Bae</small></h1>
-      <ol class="breadcrumb">
-        <li><a href="main.html">Visualization</a></li>
-        <li><a href="explanation.html" class="active">Explanation</a></li>
-      </ol>
- </body>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#" id="user_title">
+            <strong>Nicholas Roberson</strong></a>
+        </div>
+        <ul class="nav navbar-nav" style="font-weight:bold;">
+          <li class="active"><a id="user_graph">User Graph</a></li>
+          <li id="top_songs"><a >Top Songs</a></li>
+          <li id="top_artists"><a>Top Artists</a></li>
+          <li id="top_albums"><a>Top Albums</a></li>
+          <li id="top_playlists"><a onClick="generateTopPlaylists()">Top Playlists</a></li>
+        </ul>
+        <div align="right">
+          <i class="fa fa-spotify spotify-logo-main" aria-hidden="true"></i></p>
+        </div>
+      </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="row" style="height:450px; padding-left:15px;">
+      <iframe src="https://open.spotify.com/embed?uri=spotify:user:spotify:playlist:3rgsDhGHZxZ9sB9DQWQfuf&view=coverart" width="300px" height="450" frameborder="0" allowtransparency="true"></iframe>
+      <div id="svg"></div>
+    </div>
+  </body>
 </html>

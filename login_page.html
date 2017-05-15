@@ -18,23 +18,24 @@
 
   </head>
 
-  <body class="standard-padding">
+  <body class="standard-padding login-background">
     <!-- HEADER & BREADCRUMB -->
-    <h1>Spotify User Visualization <small>Nick Roberson and Jonghoon Bae</small></h1>
-    <ol class="breadcrumb">
-      <li><a href="main.html">Visualization</a></li>
-      <li><a href="explanation.html" class="active">Explanation</a></li>
-    </ol>
+    <div class="well well-lg main-well-login-screen">
+      <div class="row top-row-login-screen">
+        <p align="center" class="spotify-logo"><i class="fa fa-spotify spotify-logo" aria-hidden="true"></i></p>
+        <h1 align="center">Spotify User Visualization </h1>
+        <h5 align="center">Nick Roberson and Jonghoon Bae</h3>
+      </div>
 
-    <!-- LOGIN FIELD -->
-    <div class="center">
-      <div class="row" style="padding-top: 25px;">
-        <div class="well well-lg">
-          <script type="text/javascript" src="src/require.js"></script>
-          <script type="text/javascript" src="src/login_page.js"></script>
-          <button id="login-button" class="btn btn-default button_login_size" onClick="login()">Login</button>
-          <a id="nav_button" class="btn btn-default button_login_size" style="display: none;" href="main.html" >Go To Visualization -></button>
-        </div>
+      <!-- LOGIN FIELD -->
+      <div class="row bottom-row-login-screen" align="center" >
+        <script type="text/javascript" src="src/require.js"></script>
+        <script type="text/javascript" src="src/login_page.js"></script>
+        <h4 align="center">Login through Spotify</h4>
+        <button align="center" id="login-button" class="btn btn-default btn-large" onClick="login()">
+          <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+        </button>
+        <a align="center" id="nav_button" class="btn btn-default login-button" style="display:none;" href="main.html" >Go to Visualization</button>
       </div>
     </div>
   </body>
