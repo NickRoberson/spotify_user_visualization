@@ -1,5 +1,11 @@
 var access_token = sessionStorage.getItem('OAuth');
 var user = JSON.parse(sessionStorage.getItem('user'));
+
+// CONSTANTS
+var MAX_ARTISTS = 50;
+var MAX_TRACKS = 50;
+var MAX_PLAYLISTS = 50;
+
 //var svg = d3.select("svg").attr('width','900px')
 //                          .attr('height','500px');
 
@@ -8,10 +14,10 @@ console.log("Access Token = " + access_token);
 console.log("User = " + user);
 
 // TABS
-var topPlaylists = d3.select('#top_playlists')
+var topPlaylists = d3.select('#playlists')
                       .on("click",function() {
-                          console.log("Getting top playlists for user.");
-                          listPlaylists();
+                          console.log("Getting playlists for user.");
+                          meAllPlaylists();
                       });
 var topPlaylists = d3.select('#top_songs')
                       .on("click",function() {
@@ -29,34 +35,13 @@ var userGraph = d3.select('#user_graph')
                         makeUserGraph();
                       });
 
-function listPlaylists() {
-  console.log("List Playlists");
-  var base_url = "https://api.spotify.com/v1/users/" + user.id + "/playlists";
-  var playlists;
-  var call_url = base_url + '?' + $.param({
-    'user_id' : user.id,
-    'access_token' : access_token,
-    'limit' : 15
-  });
-  $.ajax({
-    url: call_url,
-    dataType: "json",
-    type : "GET",
-    success : function(result) {
-      console.log(result);
-      result.items.reverse();
-      addItems(result);
-    }
-  });
-};
-
 // gets top X (0 through 50) playlists determined by 'limit'
-function meAllPlaylists(limit) {
+function meAllPlaylists() {
   console.log("List Playlists");
   var base_url = "https://api.spotify.com/v1/me/playlists";
   var playlists;
   var call_url = base_url + '?' + $.param({
-    'limit' : limit
+    'limit' : MAX_PLAYLISTS
   });  $.ajax({
     url: call_url,
     headers: {
@@ -66,6 +51,7 @@ function meAllPlaylists(limit) {
     type : "GET",
     success : function(result) {
       console.log(result);
+      addItems(result);
     }
   });
 };
@@ -92,8 +78,7 @@ function listSongs() {
   console.log("List Songs");
   var base_url = "https://api.spotify.com/v1/me/tracks";
   var call_url = base_url + '?' + $.param({
-    'type':'tracks',
-    'limit' : 20,
+    'limit' : MAX_TRACKS,
     'time_range':'long_term',
   });
   $.ajax({
@@ -120,8 +105,8 @@ function listArtists() {
   console.log("List Artists");
   var base_url = "https://api.spotify.com/v1/me/top/artists";
   var call_url = base_url + '?' + $.param({
-    'type':'artists',
-    'limit': 20
+    'limit': MAX_ARTISTS,
+    'time_range':'long_term',
   });
   $.ajax({
     url: call_url,
@@ -132,6 +117,7 @@ function listArtists() {
     type : "GET",
     success : function(result) {
       console.log(result);
+      addItems(result);
     }
   });
 };
@@ -184,7 +170,7 @@ function makeUserGraph() {
   d3.selectAll('svg').remove();
 
   var width = screen.width,
-    height = 500;
+    height = screen.height;
 
 var force = d3.layout.force()
     .size([width, height])
