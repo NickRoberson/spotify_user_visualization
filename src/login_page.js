@@ -28,7 +28,7 @@ function authorize_user() {
                     //userProfilePlaceholder.innerHTML = userProfileTemplate(response);
                     console.log(response);
                     sessionStorage.setItem('user',JSON.stringify(response));
-                    console.log(JSON.parse(sessionStorage.getItem('user')));
+                    //console.log(JSON.parse(sessionStorage.getItem('user')));
                     $('#nav_button').show();
                     $('#login-button').hide();
                     var message = document.getElementById('message_login_screen');

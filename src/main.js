@@ -1,39 +1,49 @@
 var access_token = sessionStorage.getItem('OAuth');
 var user = JSON.parse(sessionStorage.getItem('user'));
 
+
 // CONSTANTS
 var MAX_ARTISTS = 50;
 var MAX_TRACKS = 50;
 var MAX_PLAYLISTS = 50;
+var userGraph;
+var topPlaylists;
+var topTracks;
+var topArtists;
+var list_area;
 
-//var svg = d3.select("svg").attr('width','900px')
-//                          .attr('height','500px');
+startup();
 
-var list_area = d3.select('#song_area');
-console.log("Access Token = " + access_token);
-console.log("User = " + user);
+function startup() {
+  d3.select('#user_title').text(user.display_name);
+  list_area = d3.select('#song_area');
+  console.log("Access Token = " + access_token);
+  console.log(user);
 
-// TABS
-var topPlaylists = d3.select('#playlists')
-                      .on("click",function() {
-                          console.log("Getting playlists for user.");
-                          meAllPlaylists();
-                      });
-var topPlaylists = d3.select('#top_songs')
-                      .on("click",function() {
-                          console.log("Getting top songs for user.");
-                          listSongs();
-                      });
-var topArtists = d3.select('#top_artists')
+  // TABS
+  topPlaylists = d3.select('#playlists')
+                        .on("click",function() {
+                            console.log("Getting playlists for user.");
+                            meAllPlaylists();
+                        });
+  topPlaylists = d3.select('#top_songs')
+                        .on("click",function() {
+                            console.log("Getting top songs for user.");
+                            listSongs();
+                        });
+  topArtists = d3.select('#top_artists')
+                        .on('click', function() {
+                            console.log("Getting top artists for user.");
+                            listArtists();
+                        });
+  userGraph = d3.select('#user_graph')
                       .on('click', function() {
-                          console.log("Getting top artists for user.");
-                          listArtists();
-                      });
-var userGraph = d3.select('#user_graph')
-                    .on('click', function() {
-                        console.log("Generating User graph.");
-                        makeUserGraph();
-                      });
+                          console.log("Generating User graph.");
+                          makeUserGraph();
+                        });
+  makeUserGraph();
+}
+
 
 // gets top X (0 through 50) playlists determined by 'limit'
 function meAllPlaylists() {
