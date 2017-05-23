@@ -1,7 +1,7 @@
 var client_id = "85f22cf5c62d45a5850c744d876fc4a0";
 var client_secret = "ee25f76fe69e4418adbf136ac8dfce32";
 var redirect_uri = "http://localhost:8000/login_page.html";
-var scopes = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative';
+var scopes = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative user-top-read user-library-modify user-library-read';
 var base_url = 'https://accounts.spotify.com/authorize';
 var url;
 var stateKey = 'spotify_auth_state';
@@ -59,38 +59,16 @@ function login() {
     console.log("Login");
     var state = generateRandomString(16);
     localStorage.setItem(stateKey, state);
-    var scope = 'user-read-private user-read-email';
     var url = 'https://accounts.spotify.com/authorize';
     url += '?response_type=token';
     url += '&client_id=' + encodeURIComponent(client_id);
-    url += '&scope=' + encodeURIComponent(scope);
+    url += '&scope=' + encodeURIComponent(scopes);
     url += '&redirect_uri=' + encodeURIComponent(redirect_uri);
     url += '&state=' + encodeURIComponent(state);
     url += '&show_dialog' + encodeURIComponent('true');
     window.location = url;
 };
 
-/*
-function call(code) {
-
-  var call_url = base_url + '?' + $.param({
-    'response_type' : 'code',
-    'client_id' : client_id,
-    'redirect_uri' : redirect_uri,
-    'scope' : scopes,
-    'show_dialog':'true'
-  });
-
-
-  $.ajax({
-  url: "https://accounts.spotify.com/authorize",
-  dataType: "json",
-  type : "GET",
-  success : function(result) {
-    console.log(result);
-  }
-}
-}*/
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string

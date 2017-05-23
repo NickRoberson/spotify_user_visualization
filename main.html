@@ -8,12 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!-- IMPORT BOOTSTRAP -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
     <!-- IMPORT D3 -->
     <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
     <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+
   </head>
 
   <body class="standard-padding main-page-theme">
@@ -27,7 +30,6 @@
           <li class="active"><a id="user_graph">User Graph</a></li>
           <li id="top_songs"><a >Top Songs</a></li>
           <li id="top_artists"><a>Top Artists</a></li>
-          <li id="top_albums"><a>Top Albums</a></li>
           <li id="top_playlists"><a>Top Playlists</a></li>
         </ul>
         <div align="right">
@@ -37,13 +39,10 @@
     </nav>
 
     <!-- CONTENT -->
-    <div class="container">
-      <div class="row" style="height:450px; padding-left:15px;">
-        <iframe src="https://open.spotify.com/embed?uri=spotify:user:spotify:playlist:3rgsDhGHZxZ9sB9DQWQfuf&view=coverart" width="300px" height="450" frameborder="0" allowtransparency="true"></iframe>
-        <div id="svg"></div>
-      </div>
-    </div>
-    <script type="text/javascript" src="src/api_calls.js"></script>
+    <div id="song_area"></div>
+    <!--  <iframe src="https://open.spotify.com/embed?uri=spotify:user:spotify:playlist:3rgsDhGHZxZ9sB9DQWQfuf&view=coverart" width="300px" height="450" frameborder="0" allowtransparency="true" align="right"></iframe>-->
+
     <script type="text/javascript" src="src/main.js"></script>
+
   </body>
 </html>
