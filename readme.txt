@@ -1,6 +1,20 @@
-App: 
-spotify_user_visualization
+
+----------------------------------------------------------- TITLE -----------------------------------------------------------
+
+Spotify User Visualization
 
 
-Description:
+
+-------------------------------------------------------- DESCRIPTION ---------------------------------------------------------
+
 A webpage designed to allow Spotify users to explore music visually. Implements the Spotify Web API, D3, Bootstrap, and other libraries for web development.
+
+
+---------------------------------------------------------- REQUIRES ----------------------------------------------------------
+
+Node.js 
+
+
+---------------------------------------------------------- WEBSITE ----------------------------------------------------------
+
+pending ...
