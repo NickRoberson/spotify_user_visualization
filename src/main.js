@@ -6,8 +6,8 @@ var user = JSON.parse(sessionStorage.getItem('user'));
 var MAX_ARTISTS = 50;
 var MAX_TRACKS = 50;
 var MAX_PLAYLISTS = 50;
-var RANGE_ARTIST_GRAPH = 5;
-var DEPTH_USER_GRAPH = 3;
+var RANGE_ARTIST_GRAPH = 4;
+var DEPTH_USER_GRAPH = 4;
 var userGraph;
 var topPlaylists;
 var topTracks;
@@ -15,8 +15,14 @@ var topArtists;
 var list_area;
 
 var artists_graph = [];
+var graph = {};
+graph.nodes = [];
+graph.link = [];
 startup();
-
+/*
+SUNBURST CHART FOR TOP ARTIST GENRES AND TOP SONGS ANALYSIS
+https://bl.ocks.org/mbostock/4348373
+*/
 function startup() {
   d3.select('#user_title').text(user.display_name);
   list_area = d3.select('#song_area');
@@ -105,7 +111,6 @@ function listSongs() {
     success : function(result) {
       console.log(result);
       for(song of result.items) {
-        console.log(song.track.name);
         song.name = song.track.name;
       }
       result.items.reverse();
@@ -131,6 +136,20 @@ function listArtists() {
     type : "GET",
     success : function(result) {
       console.log(result);
+      var genres = {};
+      for (val of result.items) {
+        //console.log(val.genres);
+        for(i in val.genres) {
+          var key = val.genres[i];
+          //console.log(val.genres[i]);
+          if(genres[key]) {
+            genres[key]++;
+          } else {
+            genres[key] = 1
+          }
+        }
+      }
+      console.log(genres);
       addItems(result);
     }
   });
@@ -248,6 +267,8 @@ function populateArtistGraph() {
       var artists = result.items;
       for(i = 0; i < RANGE_ARTIST_GRAPH; i++) {
         artists[i].depth = 1;
+        // PUSH NODE TO GRAPH
+        graph.nodes.push(artists[i].name);
         artists_graph.push(artists[i]);
       }
       getRelatedArtists(artists, 2);
@@ -256,6 +277,7 @@ function populateArtistGraph() {
   //console.log(artists_graph);
   setTimeout(function() {
     console.log(artists_graph);
+    console.log(graph);
     addItems({'items' :artists_graph });
   }, 1000);
 }
@@ -268,6 +290,8 @@ function getRelatedArtists(artists, depth) {
     console.log("Getting an artists related artists.");
     for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
       artists[i].depth = depth;
+      // PUSH NODES TO GRAPH
+      graph.nodes.push(artists[i].name);
       artists_graph.push(artists[i]);
       console.log(i + ": " + artists[i].name + " : " + artists[i].id);
       var call_url = "https://api.spotify.com/v1/artists/" + artists[i].id + "/related-artists";
@@ -285,7 +309,13 @@ function getRelatedArtists(artists, depth) {
   } else {
       for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
         artists[i].depth = depth;
+        graph.nodes.push(artists[i].name);
         artists_graph.push(artists[i]);
       }
     }
 };
+
+
+function bucket(items) {
+
+}
