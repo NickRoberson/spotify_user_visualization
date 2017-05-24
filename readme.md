@@ -1,20 +1,20 @@
 
-# TITLE 
+# Title 
 
 Spotify User Visualization
 
 
 
-# DESCRIPTION 
+# Description 
 
 A webpage designed to allow Spotify users to explore music visually. Implements the Spotify Web API, D3, Bootstrap, and other libraries for web development.
 
 
-# REQUIRES 
+# Requires (only to run on personal device)
 
 Node.js 
 
 
-# WEBSITE 
+# Website 
 
 pending ...
