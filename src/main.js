@@ -17,7 +17,7 @@ var list_area;
 var artists_graph = [];
 var graph = {};
 graph.nodes = [];
-graph.link = [];
+graph.links = [];
 startup();
 /*
 SUNBURST CHART FOR TOP ARTIST GENRES AND TOP SONGS ANALYSIS
@@ -49,9 +49,9 @@ function startup() {
                       .on('click', function() {
                           console.log("Generating User graph.");
                           populateArtistGraph();
-                          makeUserGraph();
+                          //makeUserGraph();
                         });
-  makeUserGraph();
+  //makeUserGraph();
 }
 
 
@@ -186,70 +186,86 @@ function makeUserGraph() {
 
   list_area.selectAll('#list_item').remove();
   d3.selectAll('svg').remove();
+  var width = screen.width;
+  var height = screen.height;
 
-  var width = screen.width,
-    height = screen.height;
+  var svg = d3.select('body').append('svg')
+      .attr('width', width)
+      .attr('height', height);
 
-var force = d3.layout.force()
-    .size([width, height])
-    .charge(-400)
-    .linkDistance(40)
-    .on("tick", tick);
+var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(width / 2, height / 2));
 
-var drag = force.drag()
-    .on("dragstart", dragstart);
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-var link = svg.selectAll(".link"),
-    node = svg.selectAll(".node");
-
-d3.json("src/graph.json", function(error, graph) {
-  if (error) throw error;
-
-  force
-      .nodes(graph.nodes)
-      .links(graph.links)
-      .start();
-
-  link = link.data(graph.links)
+  var link = svg.append("g")
+      .attr("class", "links")
+    .selectAll("line")
+    .data(graph.links)
     .enter().append("line")
-      .attr("class", "link")
-      .style("stroke","#444444");
+      .attr('stroke','#444444')
+      .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-  node = node.data(graph.nodes)
+  var node = svg.append("g")
+      .attr("class", "nodes")
+    .selectAll("circle")
+    .data(graph.nodes)
     .enter().append("circle")
-      .attr("class", "node")
-      .attr("r", 12)
-      .style('fill','#888888')
-      .on("dblclick", dblclick)
-      .call(drag);
-});
+      .attr("r", function(d) {
+        if (d.id == user.display_name) { return 50; }
+        else { return 10; }
+       })
+       .attr("fill", function(d) {
+         if (d.id == user.display_name) { return "#84bd00"; }
+         else { return "#686868"; }
+       })
+       .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended));
 
-function tick() {
-  link.attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
+  node.append("title")
+      .text(function(d) { return d.id; });
 
-  node.attr("cx", function(d) { return d.x; })
-      .attr("cy", function(d) { return d.y; });
+  simulation.nodes(graph.nodes)
+      .on("tick", ticked);
+
+  simulation.force("link")
+      .links(graph.links);
+
+  function ticked() {
+    link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+  }
+
+function dragstarted(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
 }
 
-function dblclick(d) {
-  d3.select(this).classed("fixed", d.fixed = false);
+function dragged(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
 }
 
-function dragstart(d) {
-  d3.select(this).classed("fixed", d.fixed = true);
+function dragended(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
 }
 }
 
 // depth set to 3
 function populateArtistGraph() {
-  console.log("populateArtistGraph()")
+  console.log("populateArtistGraph()");
   var artists = [];
   var base_url = "https://api.spotify.com/v1/me/top/artists";
   var call_url = base_url + '?' + $.param({
@@ -265,20 +281,23 @@ function populateArtistGraph() {
     type : "GET",
     success : function(result) {
       var artists = result.items;
+      console.log(artists);
+      graph.nodes.push({'id' : user.display_name });
       for(i = 0; i < RANGE_ARTIST_GRAPH; i++) {
-        artists[i].depth = 1;
         // PUSH NODE TO GRAPH
-        graph.nodes.push(artists[i].name);
-        artists_graph.push(artists[i]);
-      }
-      getRelatedArtists(artists, 2);
+        graph.nodes.push({'id' : artists[i].name});
+        graph.links.push({source : user.display_name,
+                          target : artists[i].name,
+                          depth : 1});
+       }
+       getRelatedArtists(artists, 2);
     }
   });
   //console.log(artists_graph);
   setTimeout(function() {
-    console.log(artists_graph);
     console.log(graph);
-    addItems({'items' :artists_graph });
+    makeUserGraph();
+    //addItems({'items' :artists_graph });
   }, 1000);
 }
 
@@ -287,29 +306,39 @@ function populateArtistGraph() {
 function getRelatedArtists(artists, depth) {
   console.log("getRelatedArtists()");
   if (depth < DEPTH_USER_GRAPH) {
-    console.log("Getting an artists related artists.");
+    console.log("Getting related artists.");
     for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
-      artists[i].depth = depth;
+      var name = artists[i].name;
       // PUSH NODES TO GRAPH
-      graph.nodes.push(artists[i].name);
+      graph.nodes.push({'id' : artists[i].name});
       artists_graph.push(artists[i]);
-      console.log(i + ": " + artists[i].name + " : " + artists[i].id);
+      //console.log(i + ": " + artists[i].name + " : " + artists[i].id);
       var call_url = "https://api.spotify.com/v1/artists/" + artists[i].id + "/related-artists";
       $.ajax({
         url: call_url,
         dataType: "json",
         type : "GET",
         success : function(result) {
-          var artists = [];
-          artists = result.artists;
+          var artists = result.artists;
+          for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
+            graph.links.push({source : name,
+                              target : artists[i].name,
+                              depth : depth});
+          }
+          var artists = result.artists;
           getRelatedArtists(artists,depth+1);
         }
       });
     }
   } else {
+      var name;
       for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
-        artists[i].depth = depth;
-        graph.nodes.push(artists[i].name);
+        //artists[i].depth = depth;
+        name = artists[i].name;
+        graph.nodes.push({'id' : artists[i].name});
+        graph.links.push({source : name,
+                          target : artists[i].name,
+                          depth : depth});
         artists_graph.push(artists[i]);
       }
     }
