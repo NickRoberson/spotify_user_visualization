@@ -6,7 +6,7 @@ var user = JSON.parse(sessionStorage.getItem('user'));
 var MAX_ARTISTS = 50;
 var MAX_TRACKS = 50;
 var MAX_PLAYLISTS = 50;
-var RANGE_ARTIST_GRAPH = 6;
+var RANGE_ARTIST_GRAPH = 5;
 var DEPTH_USER_GRAPH = 3;
 var list_area;
 
@@ -56,9 +56,6 @@ function startup() {
   userGraph = d3.select('#user_graph')
                       .on('click', function() {
                           console.log("Generating User graph.");
-                          for(node of artists_graph) {
-                            console.log(node.node + " : " + node.child);
-                          }
                           makeUserGraph();
                         });
   //makeUserGraph();
@@ -207,7 +204,7 @@ function makeUserGraph() {
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; })
-                                 .distance(function(d) { var dist = 150 - 70*(d.source.depth);
+                                 .distance(function(d) { var dist = 150 - 30*(d.source.depth);
                                                         return dist;})
                                  .strength(1))
     .force("charge", d3.forceManyBody())
@@ -227,7 +224,7 @@ var simulation = d3.forceSimulation()
     .data(graph.nodes)
     .enter().append("circle")
       .attr("r", function(d) {
-        return 50 - d.depth*15;
+        return 60 - d.depth*12;
        })
        .attr("fill", function(d) {
          if (d.id == user.display_name) { return "#84bd00"; }
@@ -238,11 +235,8 @@ var simulation = d3.forceSimulation()
            .attr("r", 100);
        })
        .on('dblclick', function(d) {
-         var r;
-         if (d.id == user.display_name) { r = 50; }
-         else { r = 10; }
          d3.select(this).transition().duration(300)
-           .attr("r", r);
+           .attr("r", 60 - d.depth*12);
        })
        .call(d3.drag()
           .on("start", dragstarted)
@@ -304,6 +298,7 @@ function populateArtistGraph() {
     type : "GET",
     success : function(result) {
       var data = result.items;
+      console.log(data);
       //make node for user
       graph.nodes.push({ 'id' : user.display_name,
                          'data' : user,
@@ -334,28 +329,35 @@ function getRelatedArtists(artist, depth) {
       type : "GET",
       success : function(result) {
         var data = result.artists;
-        var new_depth = depth + 1;
-        for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
-          if (depth <= DEPTH_USER_GRAPH) {
+        if(data != undefined && data.length >= RANGE_ARTIST_GRAPH) {
+          var data = result.artists;
+          var new_depth = depth + 1;
+          for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
             var new_artist = data[i];
             // make node for new artist
+            console.log(new_artist);
             graph.nodes.push({ 'id' : new_artist.name,
                                 'data' : new_artist,
                                 'depth' : new_depth});
             // make link from passed artist to new artist
-            graph.links.push({ 'source' : artist.name,
+            graph.links.push({'source' : artist.name,
                               'target' : new_artist.name });
-            getRelatedArtists(data[i],new_depth);
+          }
+          if (new_depth < DEPTH_USER_GRAPH) {
+            for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
+              console.log(new_depth + " : !!!!!");
+              getRelatedArtists(data[i],new_depth);
+            }
           }
         }
       }
     });
-};
+}
 
 
 
 
-var addGenreBarChart(genres) {
+function addGenreBarChart(genres) {
 
 // Parameters for our plot
 var svg_width = 800;
