@@ -11,7 +11,7 @@ var DEPTH_USER_GRAPH = 3;
 var list_area;
 
 // DATA
-var playlists;
+var userPlaylists;
 var topTracks;
 var topArtists;
 var graph = {};
@@ -32,26 +32,30 @@ function startup() {
   $('#user_graph').hide();
 
   // PRELOAD DATA FOR USER
-  meAllPlaylists();
+  getUserPlaylists();
   populateArtistGraph();
-
+  getUserTopTracks();
+  getUserTopArtists();
   $('#user_graph').show();
 
   // TABS
   topPlaylists = d3.select('#playlists')
                         .on("click",function() {
                             console.log("Getting playlists for user.");
-                            addItems(playlists);
+                            console.log(userPlaylists);
+                            addItems(userPlaylists);
                         });
   topPlaylists = d3.select('#top_songs')
                         .on("click",function() {
                             console.log("Getting top songs for user.");
-                            listSongs();
+                            console.log(topTracks);
+                            addItems(topTracks);
                         });
   topArtists = d3.select('#top_artists')
                         .on('click', function() {
                             console.log("Getting top artists for user.");
-                            listArtists();
+                            console.log(topArtists);
+                            addItems(topArtists);
                         });
   userGraph = d3.select('#user_graph')
                       .on('click', function() {
@@ -63,7 +67,7 @@ function startup() {
 
 
 // gets top X (0 through 50) playlists determined by 'limit'
-function meAllPlaylists() {
+function getUserPlaylists() {
   console.log("List Playlists");
   var base_url = "https://api.spotify.com/v1/me/playlists";
   var call_url = base_url + '?' + $.param({
@@ -77,7 +81,7 @@ function meAllPlaylists() {
     type : "GET",
     success : function(result) {
       console.log(result);
-      playlists = result;
+      userPlaylists = result.items;
     }
   });
 };
@@ -100,12 +104,12 @@ function getPlaylistSongs(playlist_id) {
   });
 };
 
-function listSongs() {
+function getUserTopTracks() {
   console.log("List Songs");
-  var base_url = "https://api.spotify.com/v1/me/top/tracks";
+  var base_url = "https://api.spotify.com/v1/me/tracks";
   var call_url = base_url + '?' + $.param({
     'limit' : MAX_TRACKS,
-    'time_range':'long_term',
+    'time_range':'short_term',
   });
   $.ajax({
     url: call_url,
@@ -120,13 +124,14 @@ function listSongs() {
         song.name = song.track.name;
       }
       result.items.reverse();
-      addItems(result);
+      topTracks = result.items;
+      //addItems(result);
     }
   });
 };
 
 /* DOESNT WORK IDK WHY */
-function listArtists() {
+function getUserTopArtists() {
   console.log("List Artists");
   var base_url = "https://api.spotify.com/v1/me/top/artists";
   var call_url = base_url + '?' + $.param({
@@ -156,19 +161,20 @@ function listArtists() {
         }
       }
       console.log(genres);
-      addItems(result);
+      topArtists = result.items;
+      //addItems(result);
     }
   });
 };
 
 
-function addItems(list) {
+function addItems(items) {
 
   d3.selectAll('svg').remove();
   list_area.selectAll('#list_item').remove();
 
   list_area.selectAll('list_item')
-        .data(list.items)
+        .data(items)
         .enter()
           .append('div')
           .style('border','2px solid #363636')
