@@ -83,3 +83,8 @@
 .main-page-theme {
   background: #000000;
 }
+
+.node text {
+  pointer-events: none;
+  font: 10px sans-serif;
+}

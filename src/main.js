@@ -32,10 +32,11 @@ function startup() {
   $('#user_graph').hide();
 
   // PRELOAD DATA FOR USER
-  getUserPlaylists();
   populateArtistGraph();
-  getUserTopTracks();
-  getUserTopArtists();
+
+  populateUserPlaylists();
+  populateUserTopTracks();
+  populateUserTopArtists();
   $('#user_graph').show();
 
   // TABS
@@ -60,14 +61,14 @@ function startup() {
   userGraph = d3.select('#user_graph')
                       .on('click', function() {
                           console.log("Generating User graph.");
-                          makeUserGraph();
+                          makeUserGraph(graph);
                         });
   //makeUserGraph();
 }
 
 
 // gets top X (0 through 50) playlists determined by 'limit'
-function getUserPlaylists() {
+function populateUserPlaylists() {
   console.log("List Playlists");
   var base_url = "https://api.spotify.com/v1/me/playlists";
   var call_url = base_url + '?' + $.param({
@@ -104,7 +105,7 @@ function getPlaylistSongs(playlist_id) {
   });
 };
 
-function getUserTopTracks() {
+function populateUserTopTracks() {
   console.log("List Songs");
   var base_url = "https://api.spotify.com/v1/me/tracks";
   var call_url = base_url + '?' + $.param({
@@ -131,7 +132,7 @@ function getUserTopTracks() {
 };
 
 /* DOESNT WORK IDK WHY */
-function getUserTopArtists() {
+function populateUserTopArtists() {
   console.log("List Artists");
   var base_url = "https://api.spotify.com/v1/me/top/artists";
   var call_url = base_url + '?' + $.param({
@@ -167,125 +168,6 @@ function getUserTopArtists() {
   });
 };
 
-
-function addItems(items) {
-
-  d3.selectAll('svg').remove();
-  list_area.selectAll('#list_item').remove();
-
-  list_area.selectAll('list_item')
-        .data(items)
-        .enter()
-          .append('div')
-          .style('border','2px solid #363636')
-          .style('border-radius','15px')
-          .style('padding','5px 5px 5px 10px')
-          .style('color','white')
-          .style('width','350px')
-          .style('margin','5px')
-          .attr('id','list_item')
-          .text(d => d.name)
-          .on("mouseover", function(d){
-            d3.select(this).style("border-color", "#84bd00");
-          })
-          .text(d => d.name)
-          .on("mouseout", function(d){
-            d3.select(this).style("border-color", "#363636");
-          });
-};
-
-function makeUserGraph() {
-
-  list_area.selectAll('#list_item').remove();
-  d3.selectAll('svg').remove();
-  d3.selectAll('#graph').remove();
-
-  var width = screen.width;
-  var height = screen.height;
-
-  var svg = d3.select('body').append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .attr('id','graph');
-
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; })
-                                 .distance(function(d) { var dist = 150 - 30*(d.source.depth);
-                                                        return dist;})
-                                 .strength(1))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2 - 100));
-
-  var link = svg.append("g")
-      .attr("class", "links")
-    .selectAll("line")
-    .data(graph.links)
-    .enter().append("line")
-      .attr('stroke','#444444')
-      .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-  var node = svg.append("g")
-      .attr("class", "nodes")
-    .selectAll("circle")
-    .data(graph.nodes)
-    .enter().append("circle")
-      .attr("r", function(d) {
-        return 60 - d.depth*12;
-       })
-       .attr("fill", function(d) {
-         if (d.id == user.display_name) { return "#84bd00"; }
-         else { return "#686868"; }
-       })
-       .on('click', function(d) {
-         d3.select(this).transition().duration(300)
-           .attr("r", 100);
-       })
-       .on('dblclick', function(d) {
-         d3.select(this).transition().duration(300)
-           .attr("r", 60 - d.depth*12);
-       })
-       .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
-
-  node.append("title")
-      .text(function(d) { return d.id; });
-
-  simulation.nodes(graph.nodes)
-      .on("tick", ticked);
-
-  simulation.force("link")
-      .links(graph.links);
-
-  function ticked() {
-    link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
-
-    node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-  }
-
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-  d.fx = d.x;
-  d.fy = d.y;
-}
-
-function dragged(d) {
-  d.fx = d3.event.x;
-  d.fy = d3.event.y;
-}
-
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fixed = true;
-}
-}
 
 // depth set to 3
 function populateArtistGraph() {
