@@ -22,7 +22,7 @@ function addItems(items) {
           .on("mouseout", function(d){
             d3.select(this).style("border-color", "#363636");
           });
-};
+}
 
 function makeUserGraph() {
 
@@ -82,14 +82,14 @@ function makeUserGraph() {
   node.append("title")
       .text(function(d) { return d.id; });
 
-      // Append images
-  var images = node.append("g")
+  // Append images
+  /*  var images = node.append("g")
             .attr("xlink:href",  function(d) { return d.data.images[0].url;})
             .attr("x", function(d) { return d.cx;})
             .attr("y", function(d) { return d.cy;})
             .attr("height", 20)
             .attr("width", 20);
-
+  */
   simulation.nodes(graph.nodes)
             .on("tick", ticked);
 

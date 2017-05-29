@@ -1,3 +1,4 @@
+// GET DATA PASSED FROM LOGIN SCREEN
 var access_token = sessionStorage.getItem('OAuth');
 var user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -9,14 +10,22 @@ var MAX_PLAYLISTS = 50;
 var RANGE_ARTIST_GRAPH = 5;
 var DEPTH_USER_GRAPH = 3;
 var list_area;
+var user_name;
 
 // DATA
 var userPlaylists;
 var topTracks;
 var topArtists;
+
+// USER GRAPH
 var graph = {};
 graph.nodes = [];
 graph.links = [];
+
+// GENERIC BAR CHART
+var yaxis;
+var xaxis;
+
 
 //STARTUP FUNCTION TO INITIALIZE THE PAGE
 startup();
@@ -25,7 +34,15 @@ SUNBURST CHART FOR TOP ARTIST GENRES AND TOP SONGS ANALYSIS
 https://bl.ocks.org/mbostock/4348373
 */
 function startup() {
-  d3.select('#user_title').text(user.display_name);
+  if(user.display_name == null) {
+    var email = user.email.split("@");
+    user_name = email[0];
+    console.log("user_name = " + user_name);
+  } else {
+    user_name = user.display_name;
+    console.log("user_name = " + user_name);
+  }
+  d3.select('#user_title').text(user_name);
   list_area = d3.select('#song_area');
   console.log("Access Token = " + access_token);
   console.log(user);
@@ -61,6 +78,7 @@ function startup() {
   userGraph = d3.select('#user_graph')
                       .on('click', function() {
                           console.log("Generating User graph.");
+                          console.log(graph);
                           makeUserGraph(graph);
                         });
   //makeUserGraph();
