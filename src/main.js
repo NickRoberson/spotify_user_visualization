@@ -231,6 +231,9 @@ function getRelatedArtists(artist, depth) {
     var call_url = "https://api.spotify.com/v1/artists/" + artist.id + "/related-artists";
     $.ajax({
       url: call_url,
+      headers: {
+        'Authorization': 'Bearer ' + access_token
+      },
       dataType: "json",
       type : "GET",
       success : function(result) {
