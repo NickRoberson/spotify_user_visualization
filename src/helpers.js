@@ -42,7 +42,7 @@ function makeUserGraph() {
                      .force("link", d3.forceLink().id(function(d) {
                        return d.id;
                      }).distance(40).strength(.2))
-                     .force("charge", d3.forceManyBody().strength(-200))
+                     .force("charge", d3.forceManyBody().strength(-150))
                      .force("center", d3.forceCenter(width / 2, height / 2 - 50));
 
   var link = svg.append("g")

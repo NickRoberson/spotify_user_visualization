@@ -1,6 +1,6 @@
 // GET DATA PASSED FROM LOGIN SCREEN
-var access_token = sessionStorage.getItem('OAuth');
-var user = JSON.parse(sessionStorage.getItem('user'));
+var access_token;
+var user;
 
 
 // CONSTANTS
@@ -11,6 +11,11 @@ var RANGE_ARTIST_GRAPH = 5;
 var DEPTH_USER_GRAPH = 3;
 var list_area;
 var user_name;
+
+var USER_GRAPH_KEY = "user_graph_key";
+var USER_PLAYLISTS_KEY = "user_playlists_key";
+var USER_TOP_ARTISTS_KEY = "user_top_artists_key";
+var USER_TOP_TRACKS_KEY = "user_top_tracks_key";
 
 // DATA
 var userPlaylists;
@@ -34,6 +39,10 @@ SUNBURST CHART FOR TOP ARTIST GENRES AND TOP SONGS ANALYSIS
 https://bl.ocks.org/mbostock/4348373
 */
 function startup() {
+  // PASSED FROM LOGIN_PAGE.JS
+  access_token = sessionStorage.getItem('OAuth');
+  user = JSON.parse(sessionStorage.getItem('user'));
+
   if(user.display_name == null) {
     var email = user.email.split("@");
     user_name = email[0];
@@ -42,18 +51,20 @@ function startup() {
     user_name = user.display_name;
     console.log("user_name = " + user_name);
   }
+
   d3.select('#user_title').text(user_name);
   list_area = d3.select('#song_area');
+
   console.log("Access Token = " + access_token);
   console.log(user);
+
   $('#user_graph').hide();
 
-  // PRELOAD DATA FOR USER
   populateArtistGraph();
-
   populateUserPlaylists();
-  populateUserTopTracks();
   populateUserTopArtists();
+  populateUserTopTracks();
+
   $('#user_graph').show();
 
   // TABS
@@ -81,7 +92,9 @@ function startup() {
                           console.log(graph);
                           makeUserGraph(graph);
                         });
-  //makeUserGraph();
+  setTimeout(function(){
+    makeUserGraph(graph);
+  }, 1500);
 }
 
 
@@ -166,12 +179,11 @@ function populateUserTopArtists() {
     type : "GET",
     success : function(result) {
       console.log(result);
+
       var genres = {};
       for (val of result.items) {
-        //console.log(val.genres);
         for(i in val.genres) {
           var key = val.genres[i];
-          //console.log(val.genres[i]);
           if(genres[key]) {
             genres[key]++;
           } else {
@@ -181,7 +193,6 @@ function populateUserTopArtists() {
       }
       console.log(genres);
       topArtists = result.items;
-      //addItems(result);
     }
   });
 };
