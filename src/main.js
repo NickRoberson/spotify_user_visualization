@@ -72,19 +72,19 @@ function startup() {
                         .on("click",function() {
                             console.log("Getting playlists for user.");
                             console.log(userPlaylists);
-                            addItems(userPlaylists);
+                            addItems(userPlaylists, null);
                         });
   topPlaylists = d3.select('#top_songs')
                         .on("click",function() {
                             console.log("Getting top songs for user.");
                             console.log(topTracks);
-                            addItems(topTracks);
+                            addItems(topTracks, null);
                         });
   topArtists = d3.select('#top_artists')
                         .on('click', function() {
                             console.log("Getting top artists for user.");
                             console.log(topArtists);
-                            addItems(topArtists);
+                            addItems(topArtists.items, topArtists.genres);
                         });
   userGraph = d3.select('#user_graph')
                       .on('click', function() {
@@ -191,8 +191,8 @@ function populateUserTopArtists() {
           }
         }
       }
-      console.log(genres);
-      topArtists = result.items;
+      topArtists.genres = genres;
+      topArtists.items = result.items;
     }
   });
 };

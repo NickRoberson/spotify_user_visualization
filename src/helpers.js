@@ -1,5 +1,6 @@
-function addItems(items) {
+function addItems(items, data) {
 
+  console.log(data);
   d3.selectAll('svg').remove();
   list_area.selectAll('#list_item').remove();
 
@@ -14,13 +15,20 @@ function addItems(items) {
           .style('width','350px')
           .style('margin','5px')
           .attr('id','list_item')
-          .text(d => d.name)
+          .text(function(d,i) {
+            var text = (i + 1).toString() + " : " + d.name;
+            console.log(text);
+            return text;
+          })
           .on("mouseover", function(d){
             d3.select(this).style("border-color", "#84bd00");
           })
           .text(d => d.name)
           .on("mouseout", function(d){
             d3.select(this).style("border-color", "#363636");
+          })
+          .on("click", function(d,i) {
+            addGenreBarChart();
           });
 }
 
