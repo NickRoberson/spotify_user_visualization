@@ -1,5 +1,5 @@
 .standard-padding {
-  margin: 10px 10px 10px 10px;
+  	margin: 10px 10px 10px 10px;
 }
 
 .center {
@@ -9,82 +9,82 @@
 }
 
 .border-bottom-color {
-  border-bottom: 1px solid;
-  border-color: #adadad;
+  	border-bottom: 1px solid;
+  	border-color: #adadad;
 }
 
 .btn-large {
-  width: 30%;
-  margin: auto;
-  text-align: center;
+ 	width: 30%;
+  	margin: auto;
+  	text-align: center;
 }
 
 .login-background {
-  background : #000000;
-  color: #000000;
+  	background : #000000;
+  	color: #000000;
 }
 
 .main-well-login-screen {
-  width:40%;
-  margin:auto;
-  margin-top:10%;
+  	width:40%;
+  	margin:auto;
+  	margin-top:10%;
 }
 
 .top-row-login-screen {
-  padding-bottom:15px;
-  border-bottom:1px solid #828282;
+  	padding-bottom:15px;
+  	border-bottom:1px solid #828282;
 }
 
 .bottom-row-login-screen {
-  padding-top:25px;
+  	padding-top:25px;
 }
 
 .spotify-logo {
-  font-size: 70px;
-  color: #84bd00;
+  	font-size: 70px;
+  	color: #84bd00;
 }
 
 .spotify-logo-main {
-  font-size: 29px !important;
-  align: center;
-  margin-top: 10px;
-  color: #ffffff;
+  	font-size: 29px !important;
+  	align: center;
+  	margin-top: 10px;
+  	color: #ffffff;
 }
 
 .login-button {
-  display: none;
-  width: 40%;
+  	display: none;
+  	width: 40%;
 }
 
 .top-row-main {
-  width: 100%;
-  padding-left: 15px;
-  padding-right: 15px;
-  margin-bottom:15px;
-  border-bottom 1px solid #828282;
+  	width: 100%;
+  	padding-left: 15px;
+  	padding-right: 15px;
+  	margin-bottom:15px;
+  	border-bottom: 1px solid #828282;
 }
 
 .main-page-object-background {
-  background: #ecebe8;
-  border-radius: 5px;
-}
+  	background: #ecebe8;
+  	border-radius: 5px;
+}	
 
 .active {
-  background: red;
-  border-radius: 5px;
+  	background: red;
+  	border-radius: 5px;
 }
 
 .player {
-  padding: 0px;
-  margin: 0px;
-  border-radius: 4px;
-}
+  	padding: 0px;
+  	margin: 0px;
+  	border-radius: 4px;
+}	
 
 .main-page-theme {
-  background: #000000;
+  	background: #000000;
 }
 
 .node text {
-  pointer-events: none;
-  font: 10px sans-serif;
+  	pointer-events: none;
+  	font: 10px sans-serif;
 }
