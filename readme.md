@@ -18,7 +18,7 @@ A tool for Spotify users that allows them to visualize their profile data. Coded
 
 ## Libraries
 
-Node.js 
+Node.js
 Bootstrap 
 
 ## URL 
