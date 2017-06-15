@@ -28,7 +28,19 @@ function addItems(items, data) {
 					d3.select(this).style("border-color", "#363636");
 				})
 				.on("click", function(d,i) {
-					addGenreBarChart();
+					//addGenreBarChart();
+					if (d.track.uri) {
+						d3.selectAll('#iframe_footer').remove();
+						d3.select('#footer_wrap').append('iframe')
+							.attr("id","iframe_footer")
+							.attr("src","https://open.spotify.com/embed?uri=" + d.track.uri)
+							.attr("height", "80px")
+							.attr("width", "100%")
+							.attr("frameborder","0")
+							.attr("allowtransparency","true");
+					} else  {
+						throw new "Error";
+					}
 				});
 }
 

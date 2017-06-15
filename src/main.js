@@ -2,7 +2,6 @@
 var access_token;
 var user;
 
-
 // CONSTANTS
 var MAX_ARTISTS = 50;
 var MAX_TRACKS = 50;
@@ -31,6 +30,8 @@ graph.links = [];
 var yaxis;
 var xaxis;
 
+// FOOTER
+var footer;
 
 //STARTUP FUNCTION TO INITIALIZE THE PAGE
 startup();
@@ -46,7 +47,9 @@ function startup() {
   	if(user.display_name == null) {
   	 	var email = user.email.split("@");
   	 	user_name = email[0];
+
     console.log("user_name = " + user_name);
+	
   	} else {
     	user_name = user.display_name;
    		console.log("user_name = " + user_name);
@@ -92,6 +95,14 @@ function startup() {
                         console.log(graph);
                         makeUserGraph(graph);
                     });
+
+	footer = d3.select('#footer_wrap').append('iframe')
+						.attr("id","iframe_footer")
+						.attr("src","https://open.spotify.com/embed?uri=spotify%3Atrack%3A33Q6ldVXuJyQmqs8BmAa0k")
+						.attr("height", "80px")
+						.attr("width", "100%")
+						.attr("frameborder","0")
+						.attr("allowtransparency","true");
 
   	setTimeout(function(){
    		makeUserGraph(graph);
