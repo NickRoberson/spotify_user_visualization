@@ -11,6 +11,8 @@ var DEPTH_USER_GRAPH = 3;
 var list_area;
 var user_name;
 
+var last_image_src;
+
 var USER_GRAPH_KEY = "user_graph_key";
 var USER_PLAYLISTS_KEY = "user_playlists_key";
 var USER_TOP_ARTISTS_KEY = "user_top_artists_key";
@@ -96,6 +98,7 @@ function startup() {
                         makeUserGraph(graph);
                     });
 
+	last_image_src = null;
 	footer = d3.select('#footer_wrap').append('iframe')
 						.attr("id","iframe_footer")
 						.attr("src","https://open.spotify.com/embed?uri=spotify%3Atrack%3A33Q6ldVXuJyQmqs8BmAa0k")

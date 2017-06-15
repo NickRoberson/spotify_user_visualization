@@ -28,6 +28,14 @@ function addItems(items, data) {
 					d3.select(this).style("border-color", "#363636");
 				})
 				.on("click", function(d,i) {
+
+					if (d.track.album.images[0]) {
+						last_image_src = d.track.album.images[0];
+						console.log(last_image_src);
+					} else {
+						throw new "Error";
+					}
+
 					//addGenreBarChart();
 					if (d.track.uri) {
 						d3.selectAll('#iframe_footer').remove();
@@ -37,7 +45,8 @@ function addItems(items, data) {
 							.attr("height", "80px")
 							.attr("width", "100%")
 							.attr("frameborder","0")
-							.attr("allowtransparency","true");
+							.attr("allowtransparency","true")
+							.style("margin","0px 0px 0px 10%");
 					} else  {
 						throw new "Error";
 					}
@@ -63,8 +72,8 @@ function makeUserGraph() {
         .force("link", d3.forceLink().id(function(d) {
             return d.id;
         })
-		.distance(30).strength(.3))
-        .force("charge", d3.forceManyBody().strength(-150))
+		.distance(30).strength(.2))
+        .force("charge", d3.forceManyBody().strength(-100))
         .force("center", d3.forceCenter(width / 2, height / 2 - 100));
 
     var link = svg.append("g")
