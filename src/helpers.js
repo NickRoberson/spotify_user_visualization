@@ -39,9 +39,10 @@ function makeUserGraph() {
     d3.selectAll('#graph').remove();
 
     var width = screen.width;
-    var height = screen.height;
+    var height = screen.height - 100;
 
-    var svg = d3.select('body').append('svg')
+    //var svg = d3.select('song_area').append('svg')
+	var svg = list_area.append('svg')
         .attr('width', width)
         .attr('height', height)
         .attr('id','graph');
@@ -50,9 +51,9 @@ function makeUserGraph() {
         .force("link", d3.forceLink().id(function(d) {
             return d.id;
         })
-		.distance(40).strength(.2))
+		.distance(30).strength(.3))
         .force("charge", d3.forceManyBody().strength(-150))
-        .force("center", d3.forceCenter(width / 2, height / 2 - 50));
+        .force("center", d3.forceCenter(width / 2, height / 2 - 100));
 
     var link = svg.append("g")
         .attr("class", "links")
