@@ -4,6 +4,8 @@ function addItems(items, data) {
     d3.selectAll('svg').remove();
     list_area.selectAll('#list_item').remove();
 
+	// make it so if this is a song when you double click on it 
+	// the option to add it to the list of selectedSongs for the user.
     list_area.selectAll('list_item')
 			.data(items)
 			.enter()
@@ -28,28 +30,7 @@ function addItems(items, data) {
 					d3.select(this).style("border-color", "#363636");
 				})
 				.on("click", function(d,i) {
-
-					if (d.track.album.images[0]) {
-						last_image_src = d.track.album.images[0];
-						console.log(last_image_src);
-					} else {
-						throw new "Error";
-					}
-
-					//addGenreBarChart();
-					if (d.track.uri) {
-						d3.selectAll('#iframe_footer').remove();
-						d3.select('#footer_wrap').append('iframe')
-							.attr("id","iframe_footer")
-							.attr("src","https://open.spotify.com/embed?uri=" + d.track.uri)
-							.attr("height", "80px")
-							.attr("width", "100%")
-							.attr("frameborder","0")
-							.attr("allowtransparency","true")
-							.style("margin","0px 0px 0px 10%");
-					} else  {
-						throw new "Error";
-					}
+					addAppropriateClickHandlers(d,i);
 				});
 }
 
@@ -62,7 +43,7 @@ function makeUserGraph() {
     var width = screen.width;
     var height = screen.height - 100;
 
-    //var svg = d3.select('song_area').append('svg')
+    //var svg = d3.select('svg_area').append('svg')
 	var svg = list_area.append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -165,17 +146,17 @@ function makeUserGraph() {
 function addGenreBarChart(genres) {
 
     // Parameters for our plot
-    var svg_width = 800;
-    var svg_height = 800;
-    var left_margin = 90;
+	var svg_width = 400;
+	var svg_height = 800;
     var text_height = 12;
-    var margin = 40;
-    var plot_width = svg_width - margin - left_margin;
+    var margin = 15;
+    var plot_width = svg_width - margin*2;
     var plot_height = svg_height - 2 * margin;
+
 
     // Create the SVG
     var svg = 
-		d3.select('#plot').append('svg')
+		d3.select('#svg_area').append('svg')
         	.attr('width', svg_width)
 			.attr('height', svg_height);
 
@@ -184,8 +165,8 @@ function addGenreBarChart(genres) {
 		d3.scaleBand()
         	.paddingInner(0.3)
         	.paddingOuter(0.3)
-        	.domain(Object.keys(word_counts))
-        	.range([left_margin, left_margin + plot_width]);
+        	.domain(Object.keys(genres))
+        	.range([margin, margin + plot_width]);
 
     var xaxis = d3.axisBottom(xscale);
 
@@ -206,13 +187,13 @@ function addGenreBarChart(genres) {
     // Add the y axis
     svg.append('g')
       	.attr('class', 'yaxis')
-      	.attr('transform', 'translate(' + left_margin + ', 0)')
+      	.attr('transform', 'translate(' + margin + ', 0)')
       	.call(yaxis);
 
     // Add the x axis label
     svg.append('text')
       	.attr('class', 'xaxis-label')
-      	.attr('transform', 'translate(' + (left_margin + plot_width/2) + ', ' + (svg_height) + ')')
+      	.attr('transform', 'translate(' + (margin + plot_width/2) + ', ' + (svg_height) + ')')
       	.attr('text-anchor', 'middle')
       	.text('Term');
 
@@ -225,7 +206,7 @@ function addGenreBarChart(genres) {
 }
 
 // code to make bar chart of genres for users artists
-function update_plot() {
+function update_plot(genres) {
     // Update our yscale
     yscale.domain([0, Math.max(0.01, d3.max(Object.values(word_counts)) / tweet_count)])
           .nice();
@@ -251,5 +232,49 @@ function update_plot() {
          	.transition().duration(500)
          	// Move the bar down 0.5 so the bar outline overlaps the axis line
           	.attr('y', d => yscale(d.value / tweet_count) + 0.5)
-          	.attr('height', d => yscale(0) - yscale(d.value / tweet_count));
+          	.attr('height', d => yscale(0) - yscale(d.value / tweet_count))
+			.on('click', d => listGenreTopSongs(d.key));
+}
+
+// Here we take the genre that is passed and append a list view with the 
+// top songs from a genre inside of it to the right of the bar graph with 
+// the users genre breakdown.
+function listGenreTopSongs(genre) {
+
+}
+
+function addAppropriateClickHandlers(d,i) {
+	
+	// if the clicked list item was a song, then do the following
+	if (d.track.album.images[0]) {
+		last_image_src = d.track.album.images[0];
+		console.log(last_image_src);
+	} else {
+		throw new "Error";
+	}
+	//addGenreBarChart();
+	if (d.track.uri) {
+	d3.selectAll('#iframe_footer').remove();
+	d3.select('#footer_wrap').append('iframe')
+		.attr("id","iframe_footer")
+		.attr("src","https://open.spotify.com/embed?uri=" + d.track.uri)
+		.attr("height", "80px")
+		.attr("width", "100%")
+		.attr("frameborder","0")
+		.attr("allowtransparency","true")
+		.style("margin","0px 0px 0px 0px");
+	} else  {
+		throw new "Error";
+	}
+
+	// if the clicked item was a playlist, do the following -----------
+
+	/* Create the genre bar chart or sunburst chart and add 
+	the appropriate click handlers to the bars or sunburst 
+	chart areas */
+
+	// if the clicked item was an artist, do the following -----------
+
+	/* Display the top songs for the artist in a list view 
+	and give the user the option to play them. */
 }

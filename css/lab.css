@@ -101,7 +101,6 @@
 .wrap {
     position:relative;
 	margin:0 auto;
-    /*replace 900px with your width*/
 	width:100%;
 	background: #000000;
 }

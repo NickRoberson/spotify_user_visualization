@@ -19,9 +19,17 @@ var USER_TOP_ARTISTS_KEY = "user_top_artists_key";
 var USER_TOP_TRACKS_KEY = "user_top_tracks_key";
 
 // DATA
+
+// users playlists
 var userPlaylists;
+// users top tracks
 var topTracks;
+// users top artists
 var topArtists;
+// current selected playlist 
+var userCurrentPlaylist;
+// list of users selected songs
+var selectedSongs = [];
 
 // USER GRAPH
 var graph = {};
@@ -44,25 +52,25 @@ https://bl.ocks.org/mbostock/4348373
 function startup() {
   	// PASSED FROM LOGIN_PAGE.JS
   	access_token = sessionStorage.getItem('OAuth');
-  	user = JSON.parse(sessionStorage.getItem('user'));
+  	//console.log("Access Token = " + access_token);
+	user = JSON.parse(sessionStorage.getItem('user'));
+	//console.log(user);
 
+	// Set user display name
   	if(user.display_name == null) {
   	 	var email = user.email.split("@");
   	 	user_name = email[0];
-
-    console.log("user_name = " + user_name);
-	
+    	//console.log("user_name = " + user_name);
   	} else {
     	user_name = user.display_name;
-   		console.log("user_name = " + user_name);
+   		//console.log("user_name = " + user_name);
   	}
-
   	d3.select('#user_title').text(user_name);
-  	list_area = d3.select('#song_area');
 
-  	console.log("Access Token = " + access_token);
-  	console.log(user);
+	// set list area for listing songs and such 
+  	list_area = d3.select('#svg_area');
 
+	// hide the user graph button so that users cannot click it before data is loaded
   	$('#user_graph').hide();
 
   	populateArtistGraph();
@@ -72,7 +80,7 @@ function startup() {
 
   	$('#user_graph').show();
 
-  	// TABS
+  	// Ass listeners for tabs in the navbar 
   	topPlaylists = d3.select('#playlists')
                     .on("click",function() {
                         console.log("Getting playlists for user.");
@@ -98,7 +106,12 @@ function startup() {
                         makeUserGraph(graph);
                     });
 
+	// last image for playing music 
 	last_image_src = null;
+
+	// append the spotify iframe to the footer
+
+	  
 	footer = d3.select('#footer_wrap').append('iframe')
 						.attr("id","iframe_footer")
 						.attr("src","https://open.spotify.com/embed?uri=spotify%3Atrack%3A33Q6ldVXuJyQmqs8BmAa0k")
@@ -134,6 +147,7 @@ function populateUserPlaylists() {
   	});
 };
 
+// gets all the songs with the playlist id given
 function getPlaylistSongs(playlist_id) {
   	console.log("List Playlists");
   	var base_url = "https://api.spotify.com/v1/users/" + user.id + "/playlists/" + playlist_id + "/tracks";
@@ -148,6 +162,19 @@ function getPlaylistSongs(playlist_id) {
     	type : "GET",
     	success : function(result) {
       		console.log(result);
+			
+			var genres = {};
+      		for (val of result.items) {
+        		for(i in val.genres) {
+          			var key = val.genres[i];
+          			if(genres[key]) {
+           				genres[key]++;
+          			} else {
+            			genres[key] = 1
+          			}
+        		}
+      		}
+			userCurrentPlaylist.genres = genres;
     	}
   	});
 };
