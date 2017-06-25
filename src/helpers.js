@@ -34,17 +34,97 @@ function addItems(items, data) {
 				});
 }
 
+function addItemsToList(list_id, list_items) {
+
+    //d3.selectAll('svg').remove();
+    //list_area.selectAll('#list_item').remove();
+
+	// use the list_id to add to the appropriate list view 
+	var id = "#" + list_id;
+	var list_area = d3.select(id);
+	// make it so if this is a song when you double click on it 
+	// the option to add it to the list of selectedSongs for the user.
+    list_area.selectAll('list_item')
+			.data(list_items)
+			.enter()
+				.append('li')
+				.style('border','2px solid #363636')
+				.style('border-radius','15px')
+				.style('padding','5px 5px 5px 10px')
+				.style('color','white')
+				.style('width','350px')
+				.style('margin','5px')
+				.attr('id','list_item')
+				.text(function(d,i) {
+					var text = (i + 1).toString() + " : " + d.name;
+					console.log(text);
+					return text;
+				})
+				.on("mouseover", function(d){
+					d3.select(this).style("border-color", "#84bd00");
+				})
+				.text(d => d.name)
+				.on("mouseout", function(d){
+					d3.select(this).style("border-color", "#363636");
+				})
+				.on("click", function(d,i) {
+					addAppropriateClickHandlers(d,i);
+				});
+}
+
+function appendRightHandList(element_id, items) {
+
+	var id = "#" + element_id;
+	var list_area = d3.select(id);
+	// clear list area to repopulate it.
+	list_area.selectAll("list_item").remove();
+	// append list items to list area 
+	list_area.selectAll('list_item')
+			.data(items)
+			.enter()
+				.append('div')
+				.style('border','2px solid #363636')
+				.style('border-radius','15px')
+				.style('padding','5px 5px 5px 10px')
+				.style('color','white')
+				.style('width','100%')
+				.style('margin','5px')
+				.attr('id','list_item')
+				.text(function(d,i) {
+					var text = (i + 1).toString() + " : " + d.name;
+					console.log(text);
+					return text;
+				})
+				.on("mouseover", function(d){
+					d3.select(this).style("border-color", "#84bd00");
+				})
+				.text(d => d.name)
+				.on("mouseout", function(d){
+					d3.select(this).style("border-color", "#363636");
+				})
+				.on("click", function(d,i) {
+					addAppropriateClickHandlers(d,i);
+				});
+}
+
+
 function makeUserGraph() {
 
-    list_area.selectAll('#list_item').remove();
-	d3.selectAll('svg').remove();
-    d3.selectAll('#graph').remove();
+    //list_area.selectAll('#list_item').remove();
 
-    var width = screen.width;
+	// remove any svg's 
+	d3.selectAll('svg').remove();
+    //d3.selectAll('#user_graph_area').remove();
+
+	var margin = 30;
+    var width = screen.width * .75 - margin;
     var height = screen.height - 100;
 
-    //var svg = d3.select('svg_area').append('svg')
-	var svg = list_area.append('svg')
+	// append an svg to the svg area in user_graph.html 
+    var graph_area = d3.select('#user_graph_area');
+	console.log(graph_area);
+
+	var svg = graph_area.append('svg')
         .attr('width', width)
         .attr('height', height)
         .attr('id','graph');
@@ -81,18 +161,20 @@ function makeUserGraph() {
        			});
 
     node.on('click', function(d) {
-        d3.select(this).transition().duration(300)
-    		.attr("r", 100);
-            })
-            .on('dblclick', function(d) {
-              d3.select(this).transition().duration(300)
-                .attr("r", 40 - d.depth*8);
-            })
-            .call(d3.drag()
-              .on("start", dragstarted)
-              .on("drag", dragged)
-              .on("end", dragended)
-			);
+        	d3.select(this).transition().duration(300)
+    			.attr("r", 100);
+			console.log(d.data.id);
+			getArtistsTopTracks(d.data.id);
+        	})
+        .on('dblclick', function(d) {
+        	d3.select(this).transition().duration(300)
+        	.attr("r", 40 - d.depth*8);
+        })
+        .call(d3.drag()
+        	.on("start", dragstarted)
+        	.on("drag", dragged)
+        	.on("end", dragended)
+		);
 
     node.append("title")
     	.text(function(d) { return d.id; });
@@ -138,7 +220,7 @@ function makeUserGraph() {
      	if (!d3.event.active) {
 			 simulation.alphaTarget(0);
 		}
-      	d.fixed = true;
+      	d.fixed = false;
     }
 }
 

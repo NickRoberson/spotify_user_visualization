@@ -1,4 +1,4 @@
-// GET DATA PASSED FROM LOGIN SCREEN
+// GET DATA PASSED FROM LOGIN SCREEN FOR USER
 var access_token;
 var user;
 
@@ -8,28 +8,35 @@ var MAX_TRACKS = 50;
 var MAX_PLAYLISTS = 50;
 var RANGE_ARTIST_GRAPH = 5;
 var DEPTH_USER_GRAPH = 3;
-var list_area;
-var user_name;
-
-var last_image_src;
 
 var USER_GRAPH_KEY = "user_graph_key";
 var USER_PLAYLISTS_KEY = "user_playlists_key";
 var USER_TOP_ARTISTS_KEY = "user_top_artists_key";
 var USER_TOP_TRACKS_KEY = "user_top_tracks_key";
 
-// DATA
+var LIST_SELECTED_SONGS = "list_selected_songs";
+var LIST_TOP_SONGS = "list_top_songs";
+var LIST_TOP_ARTISTS = "list_top_artists";
+var LIST_USER_PLAYLISTS = "list_user_playlists";
 
+// DATA
 // users playlists
-var userPlaylists;
+var userPlaylists = {};
+userPlaylists.items = [];
+
 // users top tracks
-var topTracks;
+var userTopTracks = {};
+userTopTracks.items = [];
+
 // users top artists
-var topArtists;
+var userTopArtists = {};
+userTopArtists.items = [];
+
 // current selected playlist 
-var userCurrentPlaylist;
+var userCurrentPlaylist = {};
+
 // list of users selected songs
-var selectedSongs = [];
+var userSelectedSongs = [];
 
 // USER GRAPH
 var graph = {};
@@ -40,23 +47,29 @@ graph.links = [];
 var yaxis;
 var xaxis;
 
+// HTML ELEMENTS IN THE PAGE
 // FOOTER
 var footer;
+// CONTENT
+var content_pane;
+// USER INFO
+var list_area;
+var user_name;
 
 //STARTUP FUNCTION TO INITIALIZE THE PAGE
-startup();
+init();
 /*
 SUNBURST CHART FOR TOP ARTIST GENRES AND TOP SONGS ANALYSIS
 https://bl.ocks.org/mbostock/4348373
 */
-function startup() {
+function init() {
   	// PASSED FROM LOGIN_PAGE.JS
   	access_token = sessionStorage.getItem('OAuth');
   	//console.log("Access Token = " + access_token);
 	user = JSON.parse(sessionStorage.getItem('user'));
 	//console.log(user);
 
-	// Set user display name
+	// Get users display name, in the absence of display name, use email. 
   	if(user.display_name == null) {
   	 	var email = user.email.split("@");
   	 	user_name = email[0];
@@ -65,53 +78,19 @@ function startup() {
     	user_name = user.display_name;
    		//console.log("user_name = " + user_name);
   	}
+
+	// Set users name on the main page
   	d3.select('#user_title').text(user_name);
 
 	// set list area for listing songs and such 
   	list_area = d3.select('#svg_area');
-
-	// hide the user graph button so that users cannot click it before data is loaded
-  	$('#user_graph').hide();
-
-  	populateArtistGraph();
-  	populateUserPlaylists();
-  	populateUserTopArtists();
-  	populateUserTopTracks();
-
-  	$('#user_graph').show();
-
-  	// Ass listeners for tabs in the navbar 
-  	topPlaylists = d3.select('#playlists')
-                    .on("click",function() {
-                        console.log("Getting playlists for user.");
-                    	console.log(userPlaylists);
-                    	addItems(userPlaylists, null);
-                    });
-  	topPlaylists = d3.select('#top_songs')
-                    .on("click",function() {
-                        console.log("Getting top songs for user.");
-                        console.log(topTracks);
-                        addItems(topTracks, null);
-                    });
-  	topArtists = d3.select('#top_artists')
-                    .on('click', function() {
-                        console.log("Getting top artists for user.");
-                        console.log(topArtists);
-                        addItems(topArtists.items, topArtists.genres);
-                    });
-  	userGraph = d3.select('#user_graph')
-                    .on('click', function() {
-                        console.log("Generating User graph.");
-                        console.log(graph);
-                        makeUserGraph(graph);
-                    });
-
-	// last image for playing music 
-	last_image_src = null;
+	content_pane = d3.select('#content_pane');
+	content_pane.attr("height", (screen.height)*.8 + "px")
+				.attr("width",  screen.width + "px");
+				//.style("border","solid 3px #474747")
+				//.style("border-radius","5px");
 
 	// append the spotify iframe to the footer
-
-	  
 	footer = d3.select('#footer_wrap').append('iframe')
 						.attr("id","iframe_footer")
 						.attr("src","https://open.spotify.com/embed?uri=spotify%3Atrack%3A33Q6ldVXuJyQmqs8BmAa0k")
@@ -120,8 +99,93 @@ function startup() {
 						.attr("frameborder","0")
 						.attr("allowtransparency","true");
 
+
+	// hide the user graph button so that users cannot click it before data is loaded
+  	$('#user_graph').hide();
+
+	// populate (1) graph, (2) playlists, (3) top artists, and (4) top tracks.
+  	populateUserArtistGraph();
+  	populateUserPlaylists();
+  	populateUserTopArtists();
+  	populateUserTopTracks();
+
+  	$('#user_graph').show();
+
+	// load primary view for user graph
+	$("#content_pane").empty();
+	$("#content_pane").load("/html/user_graph.html"); 
+
+  	// Add listeners for tabs in the navbar 
+
+	// add listener to user playlists nav bar button 				
+  	var userPlaylistsButton = d3.select('#user_playlists')
+                    .on("click",function() {
+                        console.log("Getting playlists for user.");
+                    	console.log(userPlaylists);
+
+						$("#content_pane").empty();
+      					$("#content_pane").load("/html/user_playlists.html"); 
+
+						// add items to list
+                    });
+
+	// add listener to user top songs nav bar button 				
+	var userTopSongsButton = d3.select('#user_top_songs')
+                    .on("click",function() {
+                        console.log("Getting top songs for User.");
+                    	console.log(userPlaylists);
+                    	//addItemsToList(LIST_TOP_SONGS , topTracks);
+						
+						$("#content_pane").empty();
+      					$("#content_pane").load("/html/top_songs.html"); 
+						
+						// add items to list
+                    });
+
+	// add listener to user selected songs nav bar button 				
+  	var userSelectedSongsButton = d3.select('#user_selected_songs')
+                    .on("click",function() {
+                        console.log("Getting user selected songs.");
+                        //console.log();
+                        //addItems(topTracks, null);
+
+						$("#content_pane").empty();
+      					$("#content_pane").load("/html/selected_songs.html"); 
+
+						// add items to list
+                    });
+
+	// add listener to user gratop artists nav bar button 				
+  	var userTopArtistsButton = d3.select('#user_top_artists')
+                    .on('click', function() {
+                        console.log("Getting top artists for user.");
+                        console.log(topArtists);
+						//addItems(topArtists.items, topArtists.genres);
+						
+						$("#content_pane").empty();
+      					$("#content_pane").load("/html/top_artists.html"); 
+                    
+						// add items to list				
+					});
+
+	// add listener to user graph nav bar button 				
+  	var userGraphButton = d3.select('#user_graph')
+                    .on('click', function() {
+                        console.log("Generating User graph.");
+                        console.log(graph);
+						
+						$("#content_pane").empty();
+      					$("#content_pane").load("/html/user_graph.html"); 
+  						
+						setTimeout(function(){
+   							makeUserGraph(graph);
+							appendRightHandList("user_graph_list_area", userTopArtists.items);
+  						}, 100);
+                    });
+
   	setTimeout(function(){
    		makeUserGraph(graph);
+		appendRightHandList("user_graph_list_area", userTopArtists.items);
   	}, 1500);
 }
 
@@ -142,7 +206,7 @@ function populateUserPlaylists() {
     	type : "GET",
     	success : function(result) {
      		console.log(result);
-      		userPlaylists = result.items;
+      		userPlaylists.items = result.items;
     	}
   	});
 };
@@ -175,6 +239,7 @@ function getPlaylistSongs(playlist_id) {
         		}
       		}
 			userCurrentPlaylist.genres = genres;
+			userCurrentPlaylist.items = result.items;
     	}
   	});
 };
@@ -199,7 +264,7 @@ function populateUserTopTracks() {
         		song.name = song.track.name;
       		}
       		result.items.reverse();
-      		topTracks = result.items;
+      		userTopTracks.items = result.items;
       		//addItems(result);
     	}
   	});
@@ -234,15 +299,16 @@ function populateUserTopArtists() {
           			}
         		}
       		}
-      		topArtists.genres = genres;
-      		topArtists.items = result.items;
+      		userTopArtists.genres = {};
+			userTopArtists.genres = genres;
+      		userTopArtists.items = result.items;
     	}
   	});
 };
 
 
 // depth set to 3
-function populateArtistGraph() {
+function populateUserArtistGraph() {
   	console.log("populateArtistGraph()");
   	var base_url = "https://api.spotify.com/v1/me/top/artists";
 	var call_url = base_url + '?' + $.param({
@@ -275,7 +341,7 @@ function populateArtistGraph() {
                            			'data' : new_artist,
                            			'depth' : 1});
 
-        	getRelatedArtists(data[i], 2);
+        	getArtistRelatedArtists(data[i], 2);
       		}
     	}
   	});
@@ -283,7 +349,7 @@ function populateArtistGraph() {
 
 
 
-function getRelatedArtists(artist, depth) {
+function getArtistRelatedArtists(artist, depth) {
   	console.log("getRelatedArtists()");
 	var call_url = "https://api.spotify.com/v1/artists/" + artist.id + "/related-artists";
     $.ajax({
@@ -314,10 +380,27 @@ function getRelatedArtists(artist, depth) {
           		if (new_depth < DEPTH_USER_GRAPH) {
             		for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
               			console.log(new_depth + " : !!!!!");
-              			getRelatedArtists(data[i],new_depth);
+              			getArtistRelatedArtists(data[i],new_depth);
             		}
           		}
         	}
      	 }
     });
+}
+
+function getArtistsTopTracks(artist_id) {
+	console.log(artist_id);
+	var call_url = "https://api.spotify.com/v1/artists/" + artist_id + "/top-tracks?country=US";
+    $.ajax({
+      	url: call_url,
+      	headers: {
+        	'Authorization': 'Bearer ' + access_token
+      	},
+     	dataType: "json",
+      	type : "GET",
+      	success : function(result) {
+			console.log(result);
+			appendRightHandList("user_graph_list_area", result);     	 }
+    });
+
 }

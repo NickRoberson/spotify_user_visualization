@@ -104,3 +104,37 @@
 	width:100%;
 	background: #000000;
 }
+
+.left-hand-list-view {
+	height: 100% !important;
+	width: 25% !important;
+	padding: 15px 15px 15px 15px;
+	border: solid 3px #84bd00;
+	border-radius: 5px;
+}
+
+.right-hand-list-view {
+	height: 700px !important;
+	width: 100% !important;
+	overflow: scroll !important;
+	padding: 15px 15px 15px 15px;
+	border-left: 5px solid #828282;
+	border-block-end-style: ridge;
+}
+
+.chart {
+	max-height: 100% !important;
+	width: 50% !important;
+	padding: 15px 15px 15px 15px;
+	border: solid 3px #84bd00;
+	border-radius: 5px;
+}
+
+.content_pane {
+	margin: 15px 15px 15px 15px;
+}
+
+.user-graph-area {
+	width: 75% !important;
+	height: 100% !important;
+}
