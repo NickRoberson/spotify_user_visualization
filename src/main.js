@@ -179,13 +179,13 @@ function init() {
   						
 						setTimeout(function(){
    							makeUserGraph(graph);
-							appendRightHandList("user_graph_list_area", userTopArtists.items);
+							appendRightHandList("user_graph_list_area", userTopArtists.items, "Top Artists");
   						}, 100);
                     });
 
   	setTimeout(function(){
    		makeUserGraph(graph);
-		appendRightHandList("user_graph_list_area", userTopArtists.items);
+		appendRightHandList("user_graph_list_area", userTopArtists.items, "Top Artists");
   	}, 1500);
 }
 
@@ -388,7 +388,7 @@ function getArtistRelatedArtists(artist, depth) {
     });
 }
 
-function getArtistsTopTracks(artist_id) {
+function getArtistsTopTracks(artist_id, artist_name) {
 	console.log(artist_id);
 	var call_url = "https://api.spotify.com/v1/artists/" + artist_id + "/top-tracks?country=US";
     $.ajax({
@@ -400,7 +400,9 @@ function getArtistsTopTracks(artist_id) {
       	type : "GET",
       	success : function(result) {
 			console.log(result);
-			appendRightHandList("user_graph_list_area", result);     	 }
+			console.log(result.tracks);
+			appendRightHandList("user_graph_list_area", result.tracks, artist_name);     	 
+		}
     });
 
 }

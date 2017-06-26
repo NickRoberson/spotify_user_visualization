@@ -30,7 +30,11 @@ function addItems(items, data) {
 					d3.select(this).style("border-color", "#363636");
 				})
 				.on("click", function(d,i) {
-					addAppropriateClickHandlers(d,i);
+					if(d.id) {
+						addAppropriateClickHandlers(d.id,i);
+					} else {
+						throw "Cannot display item in footer. Not a track object.";
+					}
 				});
 }
 
@@ -72,13 +76,32 @@ function addItemsToList(list_id, list_items) {
 				});
 }
 
-function appendRightHandList(element_id, items) {
+function appendRightHandList(element_id, items, title) {
+	console.log("appendRightHandList()");
+	console.log(items);
+
+	var t = d3.select('#list_title');
+	t.style("display","inline");
+	t.selectAll('*').remove();
+	if(items[0].album) {
+		var img_url = items[0].album.images[0].url;
+		t.append('img')
+			.attr("src", img_url)
+			.attr("height", "100px")
+			.attr("width", "100px");
+	} else {
+		throw "Error";
+	}
+	t.append('h3').text(title)
+		.style("color","#ffffff");
 
 	var id = "#" + element_id;
+	console.log(id);
 	var list_area = d3.select(id);
 	// clear list area to repopulate it.
-	list_area.selectAll("list_item").remove();
+	list_area.selectAll('div').remove();
 	// append list items to list area 
+
 	list_area.selectAll('list_item')
 			.data(items)
 			.enter()
@@ -103,6 +126,7 @@ function appendRightHandList(element_id, items) {
 					d3.select(this).style("border-color", "#363636");
 				})
 				.on("click", function(d,i) {
+					console.log(d);
 					addAppropriateClickHandlers(d,i);
 				});
 }
@@ -159,17 +183,20 @@ function makeUserGraph() {
              	 if (d.id == user.display_name) { return "#84bd00"; }
              	 else { return "#686868"; }
        			});
+  var label = svg.append("g")
+      .attr("class", "labels")
+      .selectAll("text")
+      .data(graph.nodes)
+      .enter()
+	  .append("b")
+	  .append('text')
+        .attr("class", "label")
+        .text(function(d) { return d.id; });
 
     node.on('click', function(d) {
-        	d3.select(this).transition().duration(300)
-    			.attr("r", 100);
-			console.log(d.data.id);
-			getArtistsTopTracks(d.data.id);
+			console.log(d);
+			getArtistsTopTracks(d.data.id, d.id);
         	})
-        .on('dblclick', function(d) {
-        	d3.select(this).transition().duration(300)
-        	.attr("r", 40 - d.depth*8);
-        })
         .call(d3.drag()
         	.on("start", dragstarted)
         	.on("drag", dragged)
@@ -203,6 +230,13 @@ function makeUserGraph() {
 
       	node.attr("cx", function(d) { return d.x; })
           	.attr("cy", function(d) { return d.y; });
+
+		label
+    		.attr("x", function(d) { return d.x; })
+            .attr("y", function (d) { return d.y; })
+            .style("font-size", "10px")
+			.style("fill", "#ffffff")
+			.style("text-align","center");
     }
 
     function dragstarted(d) {
@@ -220,7 +254,7 @@ function makeUserGraph() {
      	if (!d3.event.active) {
 			 simulation.alphaTarget(0);
 		}
-      	d.fixed = false;
+      	//d.fixed = false;
     }
 }
 
@@ -325,29 +359,18 @@ function listGenreTopSongs(genre) {
 
 }
 
-function addAppropriateClickHandlers(d,i) {
+function addAppropriateClickHandlers(track,i) {
 	
-	// if the clicked list item was a song, then do the following
-	if (d.track.album.images[0]) {
-		last_image_src = d.track.album.images[0];
-		console.log(last_image_src);
-	} else {
-		throw new "Error";
-	}
-	//addGenreBarChart();
-	if (d.track.uri) {
+	console.log(track.id);
 	d3.selectAll('#iframe_footer').remove();
 	d3.select('#footer_wrap').append('iframe')
 		.attr("id","iframe_footer")
-		.attr("src","https://open.spotify.com/embed?uri=" + d.track.uri)
+		.attr("src","https://open.spotify.com/embed?uri=" + track.uri)
 		.attr("height", "80px")
 		.attr("width", "100%")
 		.attr("frameborder","0")
 		.attr("allowtransparency","true")
 		.style("margin","0px 0px 0px 0px");
-	} else  {
-		throw new "Error";
-	}
 
 	// if the clicked item was a playlist, do the following -----------
 
