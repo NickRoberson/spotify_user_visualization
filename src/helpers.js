@@ -183,7 +183,8 @@ function makeUserGraph() {
              	 if (d.id == user.display_name) { return "#84bd00"; }
              	 else { return "#686868"; }
        			});
-  var label = svg.append("g")
+
+  	var label = svg.append("g")
       .attr("class", "labels")
       .selectAll("text")
       .data(graph.nodes)
@@ -196,6 +197,7 @@ function makeUserGraph() {
     node.on('click', function(d) {
 			console.log(d);
 			getArtistsTopTracks(d.data.id, d.id);
+			expandGraph(d.data.id, d.id, d.depth + 1, simulation);
         	})
         .call(d3.drag()
         	.on("start", dragstarted)
@@ -258,6 +260,51 @@ function makeUserGraph() {
     }
 }
 
+function expandGraph(artist_id, artist_name, new_depth, simulation) {
+	console.log("expandGraph() " + artist_id + " : " + artist_name + " : " + new_depth);
+	var call_url = "https://api.spotify.com/v1/artists/" + artist_id + "/related-artists";
+    $.ajax({
+      	url: call_url,
+      	headers: {
+        	'Authorization': 'Bearer ' + access_token
+      	},
+     	 dataType: "json",
+      	type : "GET",
+      	success : function(result) {
+        	var data = result.artists;
+        	if(data != undefined && data.length >= RANGE_ARTIST_GRAPH) {
+         		var data = result.artists;
+          		for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
+            		var new_artist = data[i];
+            		// make node for new artist
+					// make node for new artist
+					console.log("new_artist.id = " + new_artist.name);
+					console.log("new_depth = " + new_depth);
+					console.log(new_artist);
+
+            		graph.nodes.push({	'id' : new_artist.name,
+                                		'data' : new_artist,
+                                		'depth' : new_depth});
+
+           			// make link from clicked node to new artist
+            		graph.links.push({	'source' : artist_name,
+                              			'target' : new_artist.name });
+
+          		}
+				restartGraph(simulation);
+        	}
+     	 }
+    });
+}
+
+function restartGraph() {
+
+	// update the nodes
+
+	// update the links
+
+	// restart the simulation
+}
 
 function addGenreBarChart(genres) {
 
@@ -383,3 +430,4 @@ function addAppropriateClickHandlers(track,i) {
 	/* Display the top songs for the artist in a list view 
 	and give the user the option to play them. */
 }
+

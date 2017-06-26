@@ -14,10 +14,8 @@ var USER_PLAYLISTS_KEY = "user_playlists_key";
 var USER_TOP_ARTISTS_KEY = "user_top_artists_key";
 var USER_TOP_TRACKS_KEY = "user_top_tracks_key";
 
-var LIST_SELECTED_SONGS = "list_selected_songs";
-var LIST_TOP_SONGS = "list_top_songs";
-var LIST_TOP_ARTISTS = "list_top_artists";
-var LIST_USER_PLAYLISTS = "list_user_playlists";
+var LEFT_HAND_LIST = "left_hand_list";
+var RIGHT_HAND_LIST = "right_hand_list";
 
 // DATA
 // users playlists

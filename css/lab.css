@@ -106,19 +106,20 @@
 }
 
 .left-hand-list-view {
-	height: 100% !important;
+	height: 50% !important;
 	width: 25% !important;
-	padding: 15px 15px 15px 15px;
-	border: solid 3px #84bd00;
-	border-radius: 5px;
+	overflow: scroll !important;
+	padding: 8px 8px 8px 8px;	
+	border-right: solid 2px #828282;
+	border-block-end-style: ridge;
 }
 
 .right-hand-list-view {
-	height: 450px !important;
+	height: 50% !important;
 	width: 100% !important;
 	overflow: scroll !important;
-	padding: 15px 15px 15px 15px;
-	border-left: 5px solid #828282;
+	padding: 8px 8px 8px 8px;
+	border-left: 2px solid #828282;
 	border-block-end-style: ridge;
 }
 
