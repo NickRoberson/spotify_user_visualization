@@ -184,20 +184,11 @@ function makeUserGraph() {
              	 else { return "#686868"; }
        			});
 
-  	var label = svg.append("g")
-      .attr("class", "labels")
-      .selectAll("text")
-      .data(graph.nodes)
-      .enter()
-	  .append("b")
-	  .append('text')
-        .attr("class", "label")
-        .text(function(d) { return d.id; });
 
     node.on('click', function(d) {
 			console.log(d);
 			getArtistsTopTracks(d.data.id, d.id);
-			expandGraph(d.data.id, d.id, d.depth + 1, simulation);
+			expandGraph(d.data.id, d.id, d.depth + 1);
         	})
         .call(d3.drag()
         	.on("start", dragstarted)
@@ -205,17 +196,11 @@ function makeUserGraph() {
         	.on("end", dragended)
 		);
 
+	node.append("text").attr("fill","#474747").text(d => d.id);
+
     node.append("title")
     	.text(function(d) { return d.id; });
 
-    // Append images
-    /*  var images = node.append("g")
-              .attr("xlink:href",  function(d) { return d.data.images[0].url;})
-              .attr("x", function(d) { return d.cx;})
-              .attr("y", function(d) { return d.cy;})
-              .attr("height", 20)
-              .attr("width", 20);
-    */
     simulation
 		.nodes(graph.nodes)
     	.on("tick", ticked);
@@ -232,14 +217,7 @@ function makeUserGraph() {
 
       	node.attr("cx", function(d) { return d.x; })
           	.attr("cy", function(d) { return d.y; });
-
-		label
-    		.attr("x", function(d) { return d.x; })
-            .attr("y", function (d) { return d.y; })
-            .style("font-size", "10px")
-			.style("fill", "#ffffff")
-			.style("text-align","center");
-    }
+	}
 
     function dragstarted(d) {
       	if (!d3.event.active) simulation.alphaTarget(0.3).restart();
@@ -260,7 +238,7 @@ function makeUserGraph() {
     }
 }
 
-function expandGraph(artist_id, artist_name, new_depth, simulation) {
+function expandGraph(artist_id, artist_name, new_depth) {
 	console.log("expandGraph() " + artist_id + " : " + artist_name + " : " + new_depth);
 	var call_url = "https://api.spotify.com/v1/artists/" + artist_id + "/related-artists";
     $.ajax({
@@ -291,19 +269,10 @@ function expandGraph(artist_id, artist_name, new_depth, simulation) {
                               			'target' : new_artist.name });
 
           		}
-				restartGraph(simulation);
         	}
      	 }
     });
-}
-
-function restartGraph() {
-
-	// update the nodes
-
-	// update the links
-
-	// restart the simulation
+	makeUserGraph();
 }
 
 function addGenreBarChart(genres) {
