@@ -106,8 +106,8 @@
 }
 
 .left-hand-list-view {
-	height: 50% !important;
-	width: 25% !important;
+	height: 470px !important;
+	width: 100% !important;
 	overflow: scroll !important;
 	padding: 8px 8px 8px 8px;	
 	border-right: solid 2px #828282;
@@ -115,14 +115,22 @@
 }
 
 .right-hand-list-view {
-	height: 50% !important;
+	height: 470px !important;
 	width: 100% !important;
 	overflow: scroll !important;
-	padding: 8px 8px 8px 8px;
-	border-left: 2px solid #828282;
+	padding: 8px 8px 8px 8px;	
+	border-left: solid 2px #828282;
 	border-block-end-style: ridge;
 }
 
+.right-hand-list-view-graph {
+	height: 300px !important;
+	width: 100% !important;
+	overflow: scroll !important;
+	padding: 8px 8px 8px 8px;	
+	border-left: solid 2px #828282;
+	border-block-end-style: ridge;
+}
 .chart {
 	max-height: 100% !important;
 	width: 50% !important;

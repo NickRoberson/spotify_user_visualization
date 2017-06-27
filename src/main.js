@@ -124,8 +124,10 @@ function init() {
 						$("#content_pane").empty();
       					$("#content_pane").load("/html/user_playlists.html"); 
 
-						// add items to list
-                    });
+						setTimeout(function(){
+							addItemsToList("left_hand_list", userPlaylists.items);
+  						}, 100);                    
+					});
 
 	// add listener to user top songs nav bar button 				
 	var userTopSongsButton = d3.select('#user_top_songs')
@@ -177,14 +179,19 @@ function init() {
   						
 						setTimeout(function(){
    							makeUserGraph(graph);
-							appendRightHandList("user_graph_list_area", userTopArtists.items, "Top Artists");
+							getArtistsTopTracks("user_graph_list_area", 
+												userTopArtists.items[0].id,
+												userTopArtists.items[0].name);
+							//appendRightHandList("user_graph_list_area", userTopArtists.items[0].id, "Top Artists");
   						}, 100);
                     });
 
   	setTimeout(function(){
    		makeUserGraph(graph);
-		appendRightHandList("user_graph_list_area", userTopArtists.items, "Top Artists");
-  	}, 1500);
+		getArtistsTopTracks("user_graph_list_area", 
+							userTopArtists.items[0].id,
+							userTopArtists.items[0].name);  	
+	}, 1500);
 }
 
 
@@ -268,7 +275,6 @@ function populateUserTopTracks() {
   	});
 };
 
-/* DOESNT WORK IDK WHY */
 function populateUserTopArtists() {
   	console.log("List Artists");
   	var base_url = "https://api.spotify.com/v1/me/top/artists";
@@ -386,7 +392,7 @@ function getArtistRelatedArtists(artist, depth) {
     });
 }
 
-function getArtistsTopTracks(artist_id, artist_name) {
+function getArtistsTopTracks(list_id, artist_id, artist_name) {
 	console.log(artist_id);
 	var call_url = "https://api.spotify.com/v1/artists/" + artist_id + "/top-tracks?country=US";
     $.ajax({
@@ -397,9 +403,9 @@ function getArtistsTopTracks(artist_id, artist_name) {
      	dataType: "json",
       	type : "GET",
       	success : function(result) {
-			console.log(result);
-			console.log(result.tracks);
-			appendRightHandList("user_graph_list_area", result.tracks, artist_name);     	 
+			//console.log(result);
+			//console.log(result.tracks);
+			appendRightHandList(list_id, result.tracks, artist_name);     	 
 		}
     });
 

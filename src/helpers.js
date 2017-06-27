@@ -56,7 +56,7 @@ function addItemsToList(list_id, list_items) {
 				.style('border-radius','15px')
 				.style('padding','5px 5px 5px 10px')
 				.style('color','white')
-				.style('width','350px')
+				.style('width','80%')
 				.style('margin','5px')
 				.attr('id','list_item')
 				.text(function(d,i) {
@@ -187,8 +187,8 @@ function makeUserGraph() {
 
     node.on('click', function(d) {
 			console.log(d);
-			getArtistsTopTracks(d.data.id, d.id);
-			expandGraph(d.data.id, d.id, d.depth + 1);
+			getArtistsTopTracks("user_graph_list_area", d.data.id, d.id);
+			//expandGraph(d.data.id, d.id, d.depth + 1);
         	})
         .call(d3.drag()
         	.on("start", dragstarted)
@@ -241,12 +241,14 @@ function makeUserGraph() {
 function expandGraph(artist_id, artist_name, new_depth) {
 	console.log("expandGraph() " + artist_id + " : " + artist_name + " : " + new_depth);
 	var call_url = "https://api.spotify.com/v1/artists/" + artist_id + "/related-artists";
+    var new_links = [];//graph.links;
+	var new_nodes = [];//graph.nodes;
     $.ajax({
       	url: call_url,
       	headers: {
         	'Authorization': 'Bearer ' + access_token
       	},
-     	 dataType: "json",
+     	dataType: "json",
       	type : "GET",
       	success : function(result) {
         	var data = result.artists;
@@ -256,23 +258,25 @@ function expandGraph(artist_id, artist_name, new_depth) {
             		var new_artist = data[i];
             		// make node for new artist
 					// make node for new artist
-					console.log("new_artist.id = " + new_artist.name);
-					console.log("new_depth = " + new_depth);
-					console.log(new_artist);
+					//console.log("new_artist.id = " + new_artist.name);
+					//console.log("new_depth = " + new_depth);
+					//console.log(new_artist);
 
-            		graph.nodes.push({	'id' : new_artist.name,
+            		new_nodes.push({	'id' : new_artist.name,
                                 		'data' : new_artist,
                                 		'depth' : new_depth});
 
            			// make link from clicked node to new artist
-            		graph.links.push({	'source' : artist_name,
+            		new_links.push({	'source' : artist_name,
                               			'target' : new_artist.name });
 
           		}
         	}
      	 }
     });
-	makeUserGraph();
+
+	console.log(new_nodes);
+	console.log(new_links);
 }
 
 function addGenreBarChart(genres) {
@@ -375,13 +379,13 @@ function listGenreTopSongs(genre) {
 
 }
 
-function addAppropriateClickHandlers(track,i) {
+function addAppropriateClickHandlers(d,i) {
 	
-	console.log(track.id);
+	console.log(d.id);
 	d3.selectAll('#iframe_footer').remove();
 	d3.select('#footer_wrap').append('iframe')
 		.attr("id","iframe_footer")
-		.attr("src","https://open.spotify.com/embed?uri=" + track.uri)
+		.attr("src","https://open.spotify.com/embed?uri=" + d.uri)
 		.attr("height", "80px")
 		.attr("width", "100%")
 		.attr("frameborder","0")
@@ -389,13 +393,17 @@ function addAppropriateClickHandlers(track,i) {
 		.style("margin","0px 0px 0px 0px");
 
 	// if the clicked item was a playlist, do the following -----------
-
+	if(d.type == "playlist") {
+		getPlaylistSongs(d.id);
+	}
 	/* Create the genre bar chart or sunburst chart and add 
 	the appropriate click handlers to the bars or sunburst 
 	chart areas */
 
 	// if the clicked item was an artist, do the following -----------
-
+	if(d.type == "artist") {
+		getArtistsTopTracks(d.id,d.name);
+	}
 	/* Display the top songs for the artist in a list view 
 	and give the user the option to play them. */
 }
