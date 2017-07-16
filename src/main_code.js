@@ -1,43 +1,22 @@
-function addItems(items, data) {
+/** 
+ * FUNCTIONS FOR USER GRAPH PAGE 
+*/
 
-    console.log(data);
-    d3.selectAll('svg').remove();
-    list_area.selectAll('#list_item').remove();
+/** 
+ * FUNCTIONS FOR 
+*/
 
-	// make it so if this is a song when you double click on it 
-	// the option to add it to the list of selectedSongs for the user.
-    list_area.selectAll('list_item')
-			.data(items)
-			.enter()
-				.append('div')
-				.style('border','2px solid #363636')
-				.style('border-radius','15px')
-				.style('padding','5px 5px 5px 10px')
-				.style('color','white')
-				.style('width','350px')
-				.style('margin','5px')
-				.attr('id','list_item')
-				.text(function(d,i) {
-					var text = (i + 1).toString() + " : " + d.name;
-					console.log(text);
-					return text;
-				})
-				.on("mouseover", function(d){
-					d3.select(this).style("border-color", "#84bd00");
-				})
-				.text(d => d.name)
-				.on("mouseout", function(d){
-					d3.select(this).style("border-color", "#363636");
-				})
-				.on("click", function(d,i) {
-					if(d.id) {
-						addAppropriateClickHandlers(d.id,i);
-					} else {
-						throw "Cannot display item in footer. Not a track object.";
-					}
-				});
-}
+/** 
+ * 
+*/
 
+/** 
+ * 
+*/
+
+/** 
+ * 
+*/
 function addItemsToList(list_id, list_items) {
 
     //d3.selectAll('svg').remove();
@@ -52,12 +31,7 @@ function addItemsToList(list_id, list_items) {
 			.data(list_items)
 			.enter()
 				.append('li')
-				.style('border','2px solid #363636')
-				.style('border-radius','15px')
-				.style('padding','5px 5px 5px 10px')
-				.style('color','white')
-				.style('width','80%')
-				.style('margin','5px')
+				.attr("class","list-item")
 				.attr('id','list_item')
 				.text(function(d,i) {
 					var text = (i + 1).toString() + " : " + d.name;
@@ -70,75 +44,88 @@ function addItemsToList(list_id, list_items) {
 				.text(d => d.name)
 				.on("mouseout", function(d){
 					d3.select(this).style("border-color", "#363636");
-				})
-				.on("click", function(d,i) {
-					addAppropriateClickHandlers(d,i);
 				});
 }
 
-function appendRightHandList(element_id, items, title) {
-	console.log("appendRightHandList()");
-	console.log(items);
+function appendToList(list_id, items, title) {
 
-	var t = d3.select('#list_title');
-	t.style("display","inline");
-	t.selectAll('*').remove();
+	// set title
+	var header = d3.select('#list_title');
+	header.style("display","inline");
+	header.selectAll('*').remove();
+	
+	// if there is artwork, add it to the title
 	if(items[0].album) {
 		var img_url = items[0].album.images[0].url;
-		t.append('img')
+		header.append('img')
 			.attr("src", img_url)
-			.attr("height", "100px")
-			.attr("width", "100px");
+			.attr("height", "90px")
+			.attr("width", "90px");
 	} else {
 		throw "Error";
 	}
-	t.append('h3').text(title)
+
+	// append title
+	header.append('h3').text(title)
 		.style("color","#ffffff");
 
-	var id = "#" + element_id;
-	console.log(id);
+	var id = "#" + list_id;
 	var list_area = d3.select(id);
-	// clear list area to repopulate it.
-	list_area.selectAll('div').remove();
-	// append list items to list area 
-
-	list_area.selectAll('list_item')
+	// make it so if this is a song when you double click on it 
+	// the option to add it to the list of selectedSongs for the user.
+    list_area.selectAll('list_item')
 			.data(items)
 			.enter()
-				.append('div')
-				.style('border','2px solid #363636')
-				.style('border-radius','15px')
-				.style('padding','5px 5px 5px 10px')
-				.style('color','white')
-				.style('width','100%')
-				.style('margin','5px')
-				.attr('id','list_item')
-				.text(function(d,i) {
-					var text = (i + 1).toString() + " : " + d.name;
-					console.log(text);
-					return text;
+				.append('li')
+				.attr("class","list-item")
+				.attr('id',function(d) {
+					return d.name;
 				})
 				.on("mouseover", function(d){
-					d3.select(this).style("border-color", "#84bd00");
+
 				})
-				.text(d => d.name)
 				.on("mouseout", function(d){
 					d3.select(this).style("border-color", "#363636");
-				})
-				.on("click", function(d,i) {
-					console.log(d);
-					addAppropriateClickHandlers(d,i);
-				});
+				})				
+				.append('div')
+					.append('i')
+						.attr('class','fa fa-play fa-lg li-icon')
+						.attr('aria-hidden', true)
+						.attr('hidden', true)
+						.on('click', function(d,i) {
+							play(d,i);
+						})
+						.on('mouseout', function() {
+							d3.select(this).hide();
+						})
+						.on('mouseover', function() {
+							d3.select(this).show();
+						})
+					.append('i')
+						.attr('class','fa fa-plus fa-lg li-icon')
+						.attr('aria-hidden', true)
+						.on('click', function(d,i) {
+							addTracks(d,i);
+						})
+						.on('mouseout', function() {
+							d3.select(this).hide();
+						})
+						.on('mouseover', function() {
+							d3.select(this).show();
+						})
+					.append('html').text(function(d) {
+						return d.name;
+					});
 }
 
 
-function makeUserGraph() {
+function initGraph() {
+	console.log("Displaying graph . . .\n" + "# of Nodes: " + graph.nodes.length + "\n# of Links: " + graph.links.length);
+	console.log(graph);
+	console.log(graph.nodes);
+	console.log(graph.links);
 
-    //list_area.selectAll('#list_item').remove();
-
-	// remove any svg's 
 	d3.selectAll('svg').remove();
-    //d3.selectAll('#user_graph_area').remove();
 
 	var margin = 30;
     var width = screen.width * .75 - margin;
@@ -146,7 +133,8 @@ function makeUserGraph() {
 
 	// append an svg to the svg area in user_graph.html 
     var graph_area = d3.select('#user_graph_area');
-	console.log(graph_area);
+	var nodes = graph.nodes;
+	var links = graph.links;
 
 	var svg = graph_area.append('svg')
         .attr('width', width)
@@ -160,11 +148,18 @@ function makeUserGraph() {
 		.distance(30).strength(.2))
         .force("charge", d3.forceManyBody().strength(-100))
         .force("center", d3.forceCenter(width / 2, height / 2 - 100));
+    simulation
+		.nodes(nodes)
+    	.on("tick", ticked);
+
+    simulation
+		.force("link")
+    	.links(links);
 
     var link = svg.append("g")
         .attr("class", "links")
         .selectAll("line")
-        .data(graph.links)
+        .data(links)
           	.enter().append("line")
            		.attr('stroke','#444444')
             	.attr("stroke-width", function(d) { 
@@ -174,14 +169,15 @@ function makeUserGraph() {
     var node = svg.append("g")
         .attr("class", "nodes")
     	.selectAll("circle")
-    	.data(graph.nodes)
+    	.data(nodes)
          	.enter().append("circle")
             	.attr("r", function(d) {
               		return 40 - d.depth*8;
            		})
             	.attr("fill", function(d) {
-             	 if (d.id == user.display_name) { return "#84bd00"; }
-             	 else { return "#686868"; }
+             		console.log(d.id);
+					if (d.id == user.display_name) { return "#84bd00"; }
+             	 	else { return "#686868"; }
        			});
 
 
@@ -196,18 +192,10 @@ function makeUserGraph() {
         	.on("end", dragended)
 		);
 
-	node.append("text").attr("fill","#474747").text(d => d.id);
+	//node.append("text").attr("fill","#474747").text(d => d.id);
 
     node.append("title")
     	.text(function(d) { return d.id; });
-
-    simulation
-		.nodes(graph.nodes)
-    	.on("tick", ticked);
-
-    simulation
-		.force("link")
-    	.links(graph.links);
 
     function ticked() {
     	link.attr("x1", function(d) { return d.source.x; })
@@ -234,7 +222,7 @@ function makeUserGraph() {
      	if (!d3.event.active) {
 			 simulation.alphaTarget(0);
 		}
-      	//d.fixed = false;
+      	d.fixed = false;
     }
 }
 
@@ -379,7 +367,7 @@ function listGenreTopSongs(genre) {
 
 }
 
-function addAppropriateClickHandlers(d,i) {
+function play(d,i) {
 	
 	console.log(d.id);
 	d3.selectAll('#iframe_footer').remove();
@@ -391,20 +379,10 @@ function addAppropriateClickHandlers(d,i) {
 		.attr("frameborder","0")
 		.attr("allowtransparency","true")
 		.style("margin","0px 0px 0px 0px");
+}
 
-	// if the clicked item was a playlist, do the following -----------
-	if(d.type == "playlist") {
-		getPlaylistSongs(d.id);
-	}
-	/* Create the genre bar chart or sunburst chart and add 
-	the appropriate click handlers to the bars or sunburst 
-	chart areas */
-
-	// if the clicked item was an artist, do the following -----------
-	if(d.type == "artist") {
-		getArtistsTopTracks(d.id,d.name);
-	}
-	/* Display the top songs for the artist in a list view 
-	and give the user the option to play them. */
+function addTrack(d,i) {
+	console.log("Adding " + d.name + " to selected tracks list.");
+	userSelectedSongs.push(d);
 }
 

@@ -2,13 +2,13 @@
 <html>
     <head>
       	<meta charset="utf-8">
-      	<title>Spotify Visualization</title>
-		<!-- CSS -->
+      	<title id="title">Spotify Visualization</title>
+		<!-- IMPORT JQUERY -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+		<!-- CSS/FA -->
 		<link rel="stylesheet" type="text/css" href="css/lab.css">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-		<!-- IMPORT BOOTSTRAP -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
@@ -16,41 +16,73 @@
 		<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
 		<script src="http://d3js.org/topojson.v1.min.js"></script>
 		<script src="https://d3js.org/d3.v4.min.js"></script>
-
     </head>
 
     <body class="standard-padding main-page-theme">
+	
+  	<!-- Modal -->
+  	<div class="modal fade" id="loading_modal" role="dialog">
+   		<div class="modal-dialog modal-med">
+      		<div class="modal-content">
+        		<div class="modal-header" id="modal_header">
+          			<button type="button" class="close" data-dismiss="modal">&times;</button>
+         			<h4 class="modal-title">Loading your Spotify Data . . .</h4>
+        		</div>
+        		<div class="modal-body" id="modal_body">
+					<i class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
+					<span class="sr-only">Loading...</span>
+        		</div>
+        		<div class="modal-footer">
+          			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        		</div>
+      		</div>
+    	</div>
+  	</div>
+
+		<!-- NAVBAR FOR NAVIGATING WEBSITE -->
 		<nav class="navbar navbar-inverse">
 			<div class="container-fluid">
+
+				<!-- USERS DISPLAY NAME OR EMAIL -->
 				<div class="navbar-header">
 					<a class="navbar-brand" href="#">
 						<strong id="user_title"></strong>
 					</a>
 				</div>
+
+				<!-- LIST OF PAGES -->
 				<ul class="nav navbar-nav" style="font-weight:bold;">
 					<li id="user_graph"><a>User Graph</a></li>
-					<li id="user_playlists"><a>Playlists</a></li>
-					<li id="user_top_songs"><a >Top Songs</a></li>
+					<li id="user_top_songs"><a >Top Tracks</a></li>
 					<li id="user_top_artists"><a>Top Artists</a></li>
-					<li id="user_selected_songs"><a>Selected Songs</a></li>
+					<li id="user_playlists"><a>Playlists</a></li>
+					<li id="user_selected_songs"><a>Selected Tracks</a></li>
+					<li id="about"><a>About</a></li>
 				</ul>
+
+				<!-- SPOTIFY LOGO ON RIGHT OF NAVBAR -->
 				<div align="right">
 					<i class="fa fa-spotify spotify-logo-main" aria-hidden="true"></i></p>
         		</div>
       		</div>
     	</nav>
-    	<!-- CONTENT -->
-		<div id="content_pane">
 
+    	<!-- CONTENT GOES HERE -->
+		<div id="content_pane">
 		</div>
 		
-
-     	<div id="footer">
+		<!-- FOOTER -->
+		<div id="footer">
         	<div id="footer_wrap" class="wrap">
           	</div>
      	</div>		
+
 		<!-- JS Code -->
-    	<script type="text/javascript" src="src/helpers.js"></script>
-    	<script type="text/javascript" src="src/main.js"></script>
+		<!-- Functions handling api calls to Spotify -->
+    	<script type="text/javascript" src="src/main_api_code.js"></script>
+		<!-- Functions handling interactions with the UI -->
+    	<script type="text/javascript" src="src/main_code.js"></script>
+		<!-- Functions handling the initialization of the website/UI -->
+    	<script type="text/javascript" src="src/main_init.js"></script>
   	</body>
 </html>

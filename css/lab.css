@@ -106,30 +106,37 @@
 }
 
 .left-hand-list-view {
-	height: 470px !important;
 	width: 100% !important;
 	overflow: scroll !important;
 	padding: 8px 8px 8px 8px;	
-	border-right: solid 2px #828282;
+	margin-bottom: 15px;
+	border-right: solid 3px #828282;
 	border-block-end-style: ridge;
 }
 
 .right-hand-list-view {
-	height: 470px !important;
 	width: 100% !important;
 	overflow: scroll !important;
 	padding: 8px 8px 8px 8px;	
-	border-left: solid 2px #828282;
+
+	border-left: solid 3px #828282;
 	border-block-end-style: ridge;
+	align-content: center;
+
+	overflow-x: hidden;
+	overflow-y: hidden;
 }
 
 .right-hand-list-view-graph {
-	height: 300px !important;
 	width: 100% !important;
 	overflow: scroll !important;
 	padding: 8px 8px 8px 8px;	
-	border-left: solid 2px #828282;
+
+	border-left: solid 3px #828282;
 	border-block-end-style: ridge;
+
+    overflow-x: hidden !important;
+	overflow-y: hidden !important;
 }
 .chart {
 	max-height: 100% !important;
@@ -146,4 +153,69 @@
 .user-graph-area {
 	width: 75% !important;
 	height: 100% !important;
+}
+
+.list-item {
+	width: 90%;
+	margin: 5px 5px 5px 5px;
+	padding: 8px 8px 8px 8px;
+	border: 2px solid #363636;
+	border-radius: 15px;
+	color: white;
+}
+
+.content-area-header {
+	float: left;
+	margin: 0px 0px 0px 15px;
+	width: 100%;
+}
+
+/* hide the scrollbar */
+html {
+    overflow: scroll;
+    overflow-x: hidden;
+}
+::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
+}
+/* optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    background: #FF0000;
+}
+
+.btn-group {
+	background-color: #000000 !important;
+	font-weight: bold;
+	float: right;
+}
+
+.content-area-title {
+	color: #ffffff; 
+	float: left;
+}
+
+.li-icon {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.exp-well {
+	width: 95%;
+	color: #363636;
+	margin: 15px;
+	padding: 10px 0px 10px 25px;
+	height: auto;
+}
+
+.line-barrier {
+	width: 100%;
+	height: 0%;
+	border-bottom: solid 2px #363636;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.last-well {
+	margin-bottom: 100px;
 }
