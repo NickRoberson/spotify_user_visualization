@@ -58,9 +58,7 @@ init(); // go!
 
 async function init() {
 
-	$('#loading_modal').modal({
-		'show': true
-	});
+	$('#loading_modal').modal("show");	
 
 	console.log("Starting initialization . . . ");
 
@@ -111,7 +109,7 @@ async function init() {
 	$("#content_pane").load("/html/user_graph.html", function() {
 		setTimeout(function() {
 			initGraphOnStart();
-		}, 1000)
+		}, 1500)
 	}); 	
 	console.log("Finished initialization.");
 
@@ -123,30 +121,30 @@ async function init() {
 
 function initPlaylistPane() {
 	$("#content_pane").empty();
-	$("#content_pane").load("/html/standard_view.html", function() {
+	$("#content_pane").load("/src/html/secondary_views/standard_view.html", function() {
 		setUISize(["left_hand_list", "right_hand_list"]);
 		d3.select('#page_title').text("Playlists");
-		addItemsToList("left_hand_list", userPlaylists.items); 
+		appendItems("left_hand_list", userPlaylists.items); 
 	}); 
 }
 
 function initArtistPane() {							
 	$("#content_pane").empty();
-	$("#content_pane").load("/html/top_artists.html", function() {
+	$("#content_pane").load("/src/html/secondary_views/top_artists.html", function() {
 		initTermButtons();
 		setUISize(["left_hand_list", "right_hand_list"]);
 		d3.select('#page_title').text("Top Artists");
-		addItemsToList("left_hand_list", userTopArtists.items); 
+		appendItems("left_hand_list", userTopArtists.items); 
 	}); 
 }
 
 function initTrackPane() {
 	$("#content_pane").empty();
-	$("#content_pane").load("/html/top_tracks.html", function() {
+	$("#content_pane").load("/src/html/secondary_views/top_tracks.html", function() {
 		initTermButtons();
 		setUISize(["left_hand_list", "right_hand_list"]);
 		d3.select('#page_title').text("Top Tracks");
-		addItemsToList("left_hand_list", userTopTracks.items); 
+		appendItems("left_hand_list", userTopTracks.items); 
 	}); 
 }
 
@@ -156,22 +154,22 @@ function initTrackPane() {
 
 function initSelectedSongsPane() {
 	$("#content_pane").empty();
-	$("#content_pane").load("/html/selected_tracks.html", function() {
+	$("#content_pane").load("/src/html/secondary_views/selected_tracks.html", function() {
 		setUISize(["left_hand_list"]);
-		addItemsToList("left_hand_list", userSelectedSongs); 
+		appendItems("left_hand_list", userSelectedSongs); 
 	}); 
 }
 
 function initAboutPane() {
 	$("#content_pane").empty();
-	$("#content_pane").load("/html/explanation.html", function() {
+	$("#content_pane").load("/src/html/secondary_views/explanation.html", function() {
 		// callback
 	}); 
 }
 
 function initGraphPane() {		
 	$("#content_pane").empty();
-	$("#content_pane").load("/html/user_graph.html", function() {
+	$("#content_pane").load("/src/html/secondary_views/user_graph.html", function() {
 		setUISize(["right_hand_list"]);
 		initGraph(graph);
 		appendArtistsTopTracks("right_hand_list",
@@ -248,14 +246,15 @@ function initGraphOnStart() {
 	// if there is not enough data to display visualization then tell the user. 
 	if(graph.links.length >= 30 && graph.nodes.length >= 30) {
 		setUISize(["right_hand_list"]);
-		initGraph(graph);
+		initGraph();
 		appendArtistsTopTracks("right_hand_list",
 							userTopArtists.items[0].id,
 							userTopArtists.items[0].name);
-		$('#loading_modal').modal({
-		'show': false
-		});
+		$('#loading_modal').modal("hide");	
+
 	} else {
+		$('#loading_modal').modal("hide");	
+
 		var header = d3.select("#modal_header");
 		header.selectAll('*').remove();
 		header.text('Oops, we ran into an issue!');
@@ -298,4 +297,21 @@ function initTermButtons() {
 						d3.select('#btn_medium_term').style("color",'black');
 						d3.select('#btn_short_term').style("color",'black');
 	});
+}
+
+function showNotification(header, text, duration) {
+	
+	var title = d3.select("#nmodal_title");
+	title.selectAll('*').remove();
+	title.text(header);
+
+	var body = d3.select("#nmodal_body");
+	body.selectAll('*').remove();
+	body.text(text);
+
+	$('#notification_modal').modal("show");	
+	
+	setTimeout(function() {
+		$('#notification_modal').modal("hide");	
+	}, duration);
 }

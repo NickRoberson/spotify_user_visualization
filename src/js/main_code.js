@@ -17,37 +17,71 @@
 /** 
  * 
 */
-function addItemsToList(list_id, list_items) {
+function appendItems(list_id, items) {
 
-    //d3.selectAll('svg').remove();
-    //list_area.selectAll('#list_item').remove();
-
-	// use the list_id to add to the appropriate list view 
 	var id = "#" + list_id;
 	var list_area = d3.select(id);
 	// make it so if this is a song when you double click on it 
 	// the option to add it to the list of selectedSongs for the user.
-    list_area.selectAll('list_item')
-			.data(list_items)
+    var items = list_area.selectAll('list_item')
+			.data(items)
 			.enter()
 				.append('li')
 				.attr("class","list-item")
-				.attr('id','list_item')
-				.text(function(d,i) {
-					var text = (i + 1).toString() + " : " + d.name;
-					console.log(text);
-					return text;
+				.attr('id',function(d) {
+					return d.name;
 				})
 				.on("mouseover", function(d){
 					d3.select(this).style("border-color", "#84bd00");
 				})
-				.text(d => d.name)
 				.on("mouseout", function(d){
 					d3.select(this).style("border-color", "#363636");
-				});
+				});	
+
+	items.append('i')
+			.attr('class','fa fa-play fa-lg li-child')
+			.attr('aria-hidden', true)
+			.style('float','left')
+			.on('click', function(d,i) {
+				play(d,i);
+				d3.select(this).style("color", "#84bd00");
+			})
+			.on('mouseover', function(d) {
+				d3.select(this).style("color", "#363636");
+			})
+			.on('mouseout', function(d) {
+				d3.select(this).style("color", "#FFFFFF");
+			});
+
+	items.append('i')
+			.attr('class','fa fa-plus fa-lg li-child')
+			.attr('aria-hidden', true)
+			.style('float','left')
+			.on('click', function(d,i) {
+				addTrack(d,i);
+				var text = "You have added " + d.name + " to your list of selected materials!";
+				showNotification("Item added.", text, 1000);
+				d3.select(this).style("color", "#84bd00");
+			})
+			.on('mouseover', function(d) {
+				d3.select(this).style("color", "#363636");
+			})
+			.on('mouseout', function(d) {
+				d3.select(this).style("color", "#FFFFFF");
+			});
+
+	items.append('html')
+			.attr('class','li-child')
+			.style('float','left')
+			.text(function(d) {
+				return d.name;
+			});
 }
 
 function appendToList(list_id, items, title) {
+
+	// remove everything first before appending
+	d3.select("#" + list_id).selectAll("*").remove();
 
 	// set title
 	var header = d3.select('#list_title');
@@ -69,53 +103,9 @@ function appendToList(list_id, items, title) {
 	header.append('h3').text(title)
 		.style("color","#ffffff");
 
-	var id = "#" + list_id;
-	var list_area = d3.select(id);
-	// make it so if this is a song when you double click on it 
-	// the option to add it to the list of selectedSongs for the user.
-    list_area.selectAll('list_item')
-			.data(items)
-			.enter()
-				.append('li')
-				.attr("class","list-item")
-				.attr('id',function(d) {
-					return d.name;
-				})
-				.on("mouseover", function(d){
+	// add items to the list
+	appendItems(list_id,items);
 
-				})
-				.on("mouseout", function(d){
-					d3.select(this).style("border-color", "#363636");
-				})				
-				.append('div')
-					.append('i')
-						.attr('class','fa fa-play fa-lg li-icon')
-						.attr('aria-hidden', true)
-						.attr('hidden', true)
-						.on('click', function(d,i) {
-							play(d,i);
-						})
-						.on('mouseout', function() {
-							d3.select(this).hide();
-						})
-						.on('mouseover', function() {
-							d3.select(this).show();
-						})
-					.append('i')
-						.attr('class','fa fa-plus fa-lg li-icon')
-						.attr('aria-hidden', true)
-						.on('click', function(d,i) {
-							addTracks(d,i);
-						})
-						.on('mouseout', function() {
-							d3.select(this).hide();
-						})
-						.on('mouseover', function() {
-							d3.select(this).show();
-						})
-					.append('html').text(function(d) {
-						return d.name;
-					});
 }
 
 
@@ -183,7 +173,7 @@ function initGraph() {
 
     node.on('click', function(d) {
 			console.log(d);
-			getArtistsTopTracks("user_graph_list_area", d.data.id, d.id);
+			appendArtistsTopTracks("right_hand_list", d.data.id, d.id);
 			//expandGraph(d.data.id, d.id, d.depth + 1);
         	})
         .call(d3.drag()

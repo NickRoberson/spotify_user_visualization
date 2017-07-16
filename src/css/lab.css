@@ -112,12 +112,13 @@
 	margin-bottom: 15px;
 	border-right: solid 3px #828282;
 	border-block-end-style: ridge;
+	list-style-type: none;
 }
 
 .right-hand-list-view {
 	width: 100% !important;
 	overflow: scroll !important;
-	padding: 8px 8px 8px 8px;	
+  	list-style-type: none;
 
 	border-left: solid 3px #828282;
 	border-block-end-style: ridge;
@@ -127,17 +128,6 @@
 	overflow-y: hidden;
 }
 
-.right-hand-list-view-graph {
-	width: 100% !important;
-	overflow: scroll !important;
-	padding: 8px 8px 8px 8px;	
-
-	border-left: solid 3px #828282;
-	border-block-end-style: ridge;
-
-    overflow-x: hidden !important;
-	overflow-y: hidden !important;
-}
 .chart {
 	max-height: 100% !important;
 	width: 50% !important;
@@ -157,11 +147,14 @@
 
 .list-item {
 	width: 90%;
-	margin: 5px 5px 5px 5px;
-	padding: 8px 8px 8px 8px;
+	height: 40px;
+	margin: 10px 10px 10px 15px;
+	padding: 10px 10px 10px 10px;
 	border: 2px solid #363636;
-	border-radius: 15px;
+	border-radius: 12px;
 	color: white;
+
+	vertical-align: center;
 }
 
 .content-area-header {
@@ -195,9 +188,12 @@ html {
 	float: left;
 }
 
-.li-icon {
-	margin-left: 5px;
-	margin-right: 5px;
+.li-child {
+	font-size: 15px !important;
+	margin-left: 15px;
+	margin-top: auto;
+	margin-bottom: auto;
+	vertical-align: center;
 }
 
 .exp-well {
