@@ -1,114 +1,6 @@
-/** 
- * FUNCTIONS FOR USER GRAPH PAGE 
-*/
-
-/** 
- * FUNCTIONS FOR 
-*/
-
-/** 
- * 
-*/
-
-/** 
- * 
-*/
-
-/** 
- * 
-*/
-function appendItems(list_id, items) {
-
-	var id = "#" + list_id;
-	var list_area = d3.select(id);
-	// make it so if this is a song when you double click on it 
-	// the option to add it to the list of selectedSongs for the user.
-    var items = list_area.selectAll('list_item')
-			.data(items)
-			.enter()
-				.append('li')
-				.attr("class","list-item")
-				.attr('id',function(d) {
-					return d.name;
-				})
-				.on("mouseover", function(d){
-					d3.select(this).style("border-color", "#84bd00");
-				})
-				.on("mouseout", function(d){
-					d3.select(this).style("border-color", "#363636");
-				});	
-
-	items.append('i')
-			.attr('class','fa fa-play fa-lg li-child')
-			.attr('aria-hidden', true)
-			.style('float','left')
-			.on('click', function(d,i) {
-				play(d,i);
-				d3.select(this).style("color", "#84bd00");
-			})
-			.on('mouseover', function(d) {
-				d3.select(this).style("color", "#363636");
-			})
-			.on('mouseout', function(d) {
-				d3.select(this).style("color", "#FFFFFF");
-			});
-
-	items.append('i')
-			.attr('class','fa fa-plus fa-lg li-child')
-			.attr('aria-hidden', true)
-			.style('float','left')
-			.on('click', function(d,i) {
-				addTrack(d,i);
-				var text = "You have added " + d.name + " to your list of selected materials!";
-				showNotification("Item added.", text, 1000);
-				d3.select(this).style("color", "#84bd00");
-			})
-			.on('mouseover', function(d) {
-				d3.select(this).style("color", "#363636");
-			})
-			.on('mouseout', function(d) {
-				d3.select(this).style("color", "#FFFFFF");
-			});
-
-	items.append('html')
-			.attr('class','li-child')
-			.style('float','left')
-			.text(function(d) {
-				return d.name;
-			});
-}
-
-function appendToList(list_id, items, title) {
-
-	// remove everything first before appending
-	d3.select("#" + list_id).selectAll("*").remove();
-
-	// set title
-	var header = d3.select('#list_title');
-	header.style("display","inline");
-	header.selectAll('*').remove();
-	
-	// if there is artwork, add it to the title
-	if(items[0].album) {
-		var img_url = items[0].album.images[0].url;
-		header.append('img')
-			.attr("src", img_url)
-			.attr("height", "90px")
-			.attr("width", "90px");
-	} else {
-		throw "Error";
-	}
-
-	// append title
-	header.append('h3').text(title)
-		.style("color","#ffffff");
-
-	// add items to the list
-	appendItems(list_id,items);
-
-}
-
-
+/*********************************/ 
+/* FUNCTIONS FOR USER GRAPH PANE */
+/*********************************/ 
 function initGraph() {
 	console.log("Displaying graph . . .\n" + "# of Nodes: " + graph.nodes.length + "\n# of Links: " + graph.links.length);
 	console.log(graph);
@@ -257,6 +149,106 @@ function expandGraph(artist_id, artist_name, new_depth) {
 	console.log(new_links);
 }
 
+/********************************************************************/ 
+/* FUNCTIONS FOR ADDING ITEMS (TRACKS, ARTISTS, PLAYLISTS) TO LISTS */
+/********************************************************************/ 
+
+function appendToList(list_id, items, title) {
+
+	// add header
+	appendHeader(list_id, items, title);
+
+	// add items 
+	appendItems(list_id,items);
+}
+
+function appendItems(list_id, items) {
+
+	var id = "#" + list_id;
+	var list_area = d3.select(id);
+	// make it so if this is a song when you double click on it 
+	// the option to add it to the list of selectedSongs for the user.
+    var items = list_area.selectAll('list_item')
+			.data(items)
+			.enter()
+				.append('li')
+				.attr("class","list-item")
+				.attr('id',function(d) {
+					return d.name;
+				})
+				.on("mouseover", function(d) {
+					d3.select(this).style("border-color", "#84bd00");
+					d3.select('#play_' + d.url).style('opacity','1');
+					d3.select('#plus_' + d.url).style('opacity','1');
+				})
+				.on("mouseout", function(d) {
+					d3.select(this).style("border-color", "#363636");
+					d3.select('#play_' + d.url).style('opacity','0');
+					d3.select('#plus_' + d.url).style('opacity','0');
+				});	
+
+	items.append('i')
+			.attr('class','fa fa-play fa-2x li-child')
+			.attr('aria-hidden', true)
+			.attr('id', d => {
+				return 'play_' + d.url;
+			})
+			.style('float','left')
+			.on('click', function(d,i) {
+				play(d);
+				d3.select(this).style("color", "#84bd00");
+			});
+
+	items.append('i')
+			.attr('class','fa fa-plus fa-2x li-child')
+			.attr('aria-hidden', true)
+			.style('float','left')
+			.attr('id', d => {
+				return 'plus_' + d.url;
+			})			
+			.on('click', function(d,i) {
+				addToSelectedList(d);
+				showNotification("Item added.", "You have added " + d.name + " to your list of selected materials!", 1000);
+				d3.select(this).style("color", "#84bd00");
+			});
+
+	items.append('html')
+			.attr('class','li-child')
+			.style('float','left')
+			.text(function(d) {
+				return d.name;
+			});
+}
+
+function appendHeader(list_id,items,title) {
+		// remove everything first before appending
+	d3.select("#" + list_id).selectAll("*").remove();
+
+	// set title
+	var header = d3.select('#list_title');
+	header.style("display","inline");
+	header.selectAll('*').remove();
+	
+	// if there is artwork, add it to the title
+	if(items[0].album) {
+		var img_url = items[0].album.images[0].url;
+		header.append('img')
+			.attr("src", img_url)
+			.attr("height", "90px")
+			.attr("width", "90px");
+	} else {
+		throw "Error";
+	}
+
+	// append title
+	header.append('h3').text(title)
+		.style("color","#ffffff");
+}
+
+/********************************************************/
+/* FUNCTIONS FOR ADDING VISUALIZATIONS TO MIDDLE COLUMN */
+/********************************************************/
+
 function addGenreBarChart(genres) {
 
     // Parameters for our plot
@@ -350,29 +342,102 @@ function update_plot(genres) {
 			.on('click', d => listGenreTopSongs(d.key));
 }
 
-// Here we take the genre that is passed and append a list view with the 
-// top songs from a genre inside of it to the right of the bar graph with 
-// the users genre breakdown.
+
+/********************************/
+/* FUNCTIONS FOR CLICK HANDLERS */
+/********************************/
+
 function listGenreTopSongs(genre) {
-
+	// Here we take the genre that is passed and append a list view with the 
+	// top songs from a genre inside of it to the right of the bar graph with 
+	// the users genre breakdown.
 }
 
-function play(d,i) {
-	
-	console.log(d.id);
-	d3.selectAll('#iframe_footer').remove();
-	d3.select('#footer_wrap').append('iframe')
-		.attr("id","iframe_footer")
-		.attr("src","https://open.spotify.com/embed?uri=" + d.uri)
-		.attr("height", "80px")
-		.attr("width", "100%")
-		.attr("frameborder","0")
-		.attr("allowtransparency","true")
-		.style("margin","0px 0px 0px 0px");
+function play(d) {	
+	try {
+		console.log(d);
+		d3.selectAll('#iframe_footer').remove();
+		d3.select('#footer_wrap').append('iframe')
+			.attr("id","iframe_footer")
+			.attr("src","https://open.spotify.com/embed?uri=" + d.uri)
+			.attr("height", "80px")
+			.attr("width", "100%")
+			.attr("frameborder","0")
+			.attr("allowtransparency","true")
+			.style("margin","0px 0px 0px 0px");
+	} catch (err) {
+	}
 }
 
-function addTrack(d,i) {
-	console.log("Adding " + d.name + " to selected tracks list.");
-	userSelectedSongs.push(d);
+/***********************************************************/
+/* FUNCTIONS FOR ADDING DIFF. TYPES TO SELECTED SONGS LIST */
+/***********************************************************/
+
+function addToSelectedList(d) {
+	switch(d.type) {
+		case "artist":
+			// adds top 10 songs from artist
+			addArtist(d);
+			break;
+		case "playlist":
+			// adds all songs from playlist
+			addPlaylist(d);
+			break;	
+		case "track":
+			// adds single track
+			addTrack(d);
+			break;
+		default: 
+			console.log("Added item type is undefined.")
+			console.log(d);
+			break;
+	}
 }
 
+function addTrack(track) {
+	console.log("Adding " + track.name + " to selected tracks list.");
+	// add to list 
+	userSelectedSongs.items.push(track);
+}
+
+function addPlaylist(playlist) {
+	console.log(playlist);
+	console.log("Adding " + playlist.name + " to selected tracks list.");
+  	var call_url = "https://api.spotify.com/v1/users/" + user.id + "/playlists/" + playlist.id + "/tracks";
+  	// get tracks and add them to list 
+	$.ajax({
+  		url: call_url,
+    	headers: {
+      		'Authorization': 'Bearer ' + access_token
+    	},
+    	dataType: "json",
+    	type : "GET",
+    	success : function(result) {
+			console.log(result);
+			// add to list 
+			result.items.forEach(function(item) {
+				addTrack(item);
+			});
+    	}
+  	});
+}
+
+function addArtist(artist) {
+	var call_url = "https://api.spotify.com/v1/artists/" + artist.id + "/top-tracks?country=US";
+	// get tracks and add them to list
+	$.ajax({
+      	url: call_url,
+      	headers: {
+        	'Authorization': 'Bearer ' + access_token
+      	},
+     	dataType: "json",
+      	type : "GET",
+      	success : function(result) {
+			//console.log(result);
+			// add to list
+			result.tracks.forEach(function(item) {
+				addTrack(item);
+			})
+		}
+    });
+}

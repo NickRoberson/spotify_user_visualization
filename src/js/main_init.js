@@ -24,21 +24,34 @@ var RIGHT_HAND_LIST = "right_hand_list";
 
 // Spotify data 
 
-var userPlaylists = {}; // user's playlists
-userPlaylists.items = [];
+var userPlaylists = {
+	items: [],
+	type: "playlists",
+	currentPlaylist: {}
+}; // user's playlists
 var userCurrentPlaylist = {}; // user's current selected playlist 
 
-var userTopTracks = {}; // user's top tracks
-userTopTracks.items = [];
+var userTopTracks = {
+	items: [],
+	type: "tracks",
+	currentTrack: {}
+}; // user's top tracks
 
-var userTopArtists = {}; // user's top artists
-userTopArtists.items = [];
+var userTopArtists = {
+	items: [],
+	type: "artists",
+	currentArtist: {}
+}; // user's top artists
 
-var userSelectedSongs = []; // list of users selected songs
+var userSelectedSongs = {
+	items: [],
+	type: "tracks"
+}; // list of users selected songs
 
-var graph = {}; // User graph
-graph.nodes = [];
-graph.links = [];
+var graph = {
+	nodes: [],
+	links: []
+}; // User graph
 
 var timeRange = "short_term";
 
@@ -61,13 +74,10 @@ async function init() {
 	$('#loading_modal').modal("show");	
 
 	console.log("Starting initialization . . . ");
-
 	initUserInformation();
 	initHTMLElements();
-
 	console.log("Fetching data from the Spotify API . . . ");
-	getData();
-	console.log("Data fetched.");
+	await getData();
 
 	// add listener to user playlists nav bar button 				
   	var userPlaylistsButton = d3.select('#user_playlists')
@@ -106,7 +116,7 @@ async function init() {
 
 	// default init to the graph pane	
 	$("#content_pane").empty();
-	$("#content_pane").load("/html/user_graph.html", function() {
+	$("#content_pane").load("/src/html/secondary_views/user_graph.html", function() {
 		setTimeout(function() {
 			initGraphOnStart();
 		}, 1500)
@@ -156,7 +166,7 @@ function initSelectedSongsPane() {
 	$("#content_pane").empty();
 	$("#content_pane").load("/src/html/secondary_views/selected_tracks.html", function() {
 		setUISize(["left_hand_list"]);
-		appendItems("left_hand_list", userSelectedSongs); 
+		appendItems("left_hand_list", userSelectedSongs.items); 
 	}); 
 }
 
@@ -233,10 +243,10 @@ function getData() {
   	$('#user_graph').hide();
 
 	// populate (1) graph, (2) playlists, (3) top artists, and (4) top tracks.
-  	populateUserArtistGraph();
-  	populateUserPlaylists();
-  	populateUserTopArtists();
-  	populateUserTopTracks();
+  	initArtistGraph();
+  	initPlaylists();
+  	initTopArtists();
+  	initTopTracks();
 
   	$('#user_graph').show();
 }
@@ -244,7 +254,10 @@ function getData() {
 function initGraphOnStart() {
 	
 	// if there is not enough data to display visualization then tell the user. 
-	if(graph.links.length >= 30 && graph.nodes.length >= 30) {
+	if(graph.links.length >= 30 && 
+	   graph.nodes.length >= 30 && 
+	   userPlaylists.items.length >= 50 &&
+	   userTopTracks.items.length >= 50) {
 		setUISize(["right_hand_list"]);
 		initGraph();
 		appendArtistsTopTracks("right_hand_list",
@@ -253,8 +266,7 @@ function initGraphOnStart() {
 		$('#loading_modal').modal("hide");	
 
 	} else {
-		$('#loading_modal').modal("hide");	
-
+		initAboutPane();
 		var header = d3.select("#modal_header");
 		header.selectAll('*').remove();
 		header.text('Oops, we ran into an issue!');
@@ -262,8 +274,6 @@ function initGraphOnStart() {
 		var body = d3.select("#modal_body");
 		body.selectAll('*').remove();
 		body.text("There was not enough data to load the visualization. Listen to more music!");
-
-		initAboutPane();
 	}
 }
 
@@ -314,4 +324,154 @@ function showNotification(header, text, duration) {
 	setTimeout(function() {
 		$('#notification_modal').modal("hide");	
 	}, duration);
+}
+
+
+/**********************************************/
+/* FUNCITONS FOR INITIALIZING/POPULATING DATA */
+/**********************************************/
+
+function initTopTracks() {
+  	console.log("List Songs");
+  	var base_url = "https://api.spotify.com/v1/me/tracks";
+  	var call_url = base_url + '?' + $.param({
+    	'limit' : MAX_TRACKS,
+    	'time_range':timeRange,
+  	});
+  	$.ajax({
+   		url: call_url,
+    	headers: {
+      		'Authorization': 'Bearer ' + access_token
+    	},
+    	dataType: "json",
+    	type : "GET",
+    	success : function(result) {
+      		console.log(result);
+      		for(item of result.items) {
+        		item = item.track;
+      		}
+      		result.items.reverse();
+            userTopTracks.type = "tracks";
+      		userTopTracks.items = result.items;
+			setTypes(userTopTracks.items, "track");
+      		//addItems(result);
+    	}
+  	});
+};
+
+function initTopArtists() {
+  	console.log("List Artists");
+  	var base_url = "https://api.spotify.com/v1/me/top/artists";
+  	var call_url = base_url + '?' + $.param({
+    	'limit': MAX_ARTISTS,
+    	'time_range':timeRange,
+  	});
+  	$.ajax({
+   		url: call_url,
+    	headers: {
+      		'Authorization': 'Bearer ' + access_token
+    	},
+    	dataType: "json",
+    	type : "GET",
+    	success : function(result) {
+      		console.log(result);
+            userTopArtists.type = "artists";
+			userTopArtists.genres = getGenreBreakdown(result.items);
+			setTypes(userTopArtists.items, "artist");
+      		userTopArtists.items = result.items;
+    	}
+  	});
+};
+
+function initPlaylists() {
+  	console.log("List Playlists");
+  	var base_url = "https://api.spotify.com/v1/me/playlists";
+  	var call_url = base_url + '?' + $.param({
+   	 	'limit' : MAX_PLAYLISTS
+  	});  
+	$.ajax({
+    	url: call_url,
+    	headers: {
+      		'Authorization': 'Bearer ' + access_token
+    	},
+    	dataType: "json",
+    	type : "GET",
+    	success : function(result) {
+			console.log(result);
+     		// set fields of user playlists 
+      		userPlaylists.items = result.items;
+			setTypes(userPlaylists.items, "playlist");
+    	}
+  	});
+}
+
+function initArtistGraph() {
+  	var base_url = "https://api.spotify.com/v1/me/top/artists";
+	var call_url = base_url + '?' + $.param({
+    	'limit': RANGE_ARTIST_GRAPH,
+    	'time_range':timeRange,
+  	});
+  	$.ajax({
+    	url: call_url,
+    	headers: {
+      		'Authorization': 'Bearer ' + access_token
+    	},
+    	dataType: "json",
+    	type : "GET",
+    	success : function(result) {
+      		var items = result.items;
+			// push node for user 
+			graph.nodes.push(makeNode(user.display_name, user, 0));
+      		// push nodes and links for first layer of graph
+			for(i = 0; i < RANGE_ARTIST_GRAPH; i++) {
+        		var new_artist = items[i];
+				graph.links.push(makeLink(user.display_name, new_artist.name));
+				graph.nodes.push(makeNode(new_artist.name,new_artist,1));;
+        		initArtistGraphHelper(items[i], 2);
+      		}
+    	}
+  	});
+}
+
+function initArtistGraphHelper(artist, depth) {
+	var call_url = "https://api.spotify.com/v1/artists/" + artist.id + "/related-artists";
+    $.ajax({
+      	url: call_url,
+      	headers: {
+        	'Authorization': 'Bearer ' + access_token
+      	},
+     	dataType: "json",
+      	type : "GET",
+      	success : function(result) {
+        	var data = result.artists;
+        	if(data != undefined && data.length >= RANGE_ARTIST_GRAPH) {
+         		var data = result.artists;
+          		var new_depth = depth + 1;
+				// push nodes and links
+          		for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
+            		var new_artist = data[i];
+					graph.nodes.push(makeNode(new_artist.name, new_artist, new_depth));
+					graph.links.push(makeLink(artist.name, new_artist.name));
+          		}
+          		if (new_depth < DEPTH_USER_GRAPH) {
+            		for (i = 0; i < RANGE_ARTIST_GRAPH; i++) {
+              			initArtistGraphHelper(data[i],new_depth);
+            		}
+          		}
+        	}
+     	 }
+    });
+}
+
+function makeNode(id, data, depth) {
+	var node = {'id' : id,
+                'data' : data,
+                'depth' : depth};
+	return node;
+}
+
+function makeLink(source, target) {
+	var link = {'source' : source,
+        		'target' : target };
+	return link;
 }
