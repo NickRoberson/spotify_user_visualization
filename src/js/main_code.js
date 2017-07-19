@@ -1,6 +1,7 @@
 /*********************************/ 
 /* FUNCTIONS FOR USER GRAPH PANE */
 /*********************************/ 
+
 function initGraph() {
 	console.log("Displaying graph . . .\n" + "# of Nodes: " + graph.nodes.length + "\n# of Links: " + graph.links.length);
 	console.log(graph);
@@ -154,16 +155,13 @@ function expandGraph(artist_id, artist_name, new_depth) {
 /********************************************************************/ 
 
 function appendToList(list_id, items, title) {
-
 	// add header
 	appendHeader(list_id, items, title);
-
 	// add items 
 	appendItems(list_id,items);
 }
 
 function appendItems(list_id, items) {
-
 	var id = "#" + list_id;
 	var list_area = d3.select(id);
 	// make it so if this is a song when you double click on it 
@@ -173,50 +171,60 @@ function appendItems(list_id, items) {
 			.enter()
 				.append('li')
 				.attr("class","list-item")
-				.attr('id',function(d) {
-					return d.name;
+				.attr('id',d => {
+					return 'item_' + d.id;
 				})
-				.on("mouseover", function(d) {
-					d3.select(this).style("border-color", "#84bd00");
-					d3.select('#play_' + d.url).style('opacity','1');
-					d3.select('#plus_' + d.url).style('opacity','1');
+				.on("mouseover", d => {
+					d3.select('item_' + d.id).style("background", "#363636");
+					d3.select('#play_' + d.id).style('color','#696969');
+					//d3.select('#plus_' + d.id).style('color','#696969');
 				})
-				.on("mouseout", function(d) {
-					d3.select(this).style("border-color", "#363636");
-					d3.select('#play_' + d.url).style('opacity','0');
-					d3.select('#plus_' + d.url).style('opacity','0');
+				.on("mouseout", d => {
+					d3.select('item_' + d.id).style("background", "#000000");
+					d3.select('#play_' + d.id).style('color','#000000');
+					//d3.select('#plus_' + d.id).style('color','#000000');
 				});	
 
 	items.append('i')
 			.attr('class','fa fa-play fa-2x li-child')
 			.attr('aria-hidden', true)
+			.style('color','#000000')
 			.attr('id', d => {
-				return 'play_' + d.url;
+				return 'play_' + d.id;
 			})
 			.style('float','left')
-			.on('click', function(d,i) {
+			.on('click', d => {
 				play(d);
-				d3.select(this).style("color", "#84bd00");
+				d3.select('#play_' + d.id).style("color", "#84bd00");
 			});
 
 	items.append('i')
 			.attr('class','fa fa-plus fa-2x li-child')
 			.attr('aria-hidden', true)
+			.style('color','#696969')
 			.style('float','left')
 			.attr('id', d => {
-				return 'plus_' + d.url;
+				return 'plus_' + d.id;
 			})			
-			.on('click', function(d,i) {
+			.on('click', d => {
 				addToSelectedList(d);
 				showNotification("Item added.", "You have added " + d.name + " to your list of selected materials!", 1000);
-				d3.select(this).style("color", "#84bd00");
+				d3.select('#plus_' + d.id).style("color", "#84bd00");
 			});
 
 	items.append('html')
 			.attr('class','li-child')
 			.style('float','left')
-			.text(function(d) {
+			.text(d => {
 				return d.name;
+			});
+
+	items.append('html')
+			.attr('class','li-child')
+			.style('float','right')
+			.style('margin-right','15px')
+			.text(d => {
+				return getItemTime(d);
 			});
 }
 
@@ -245,6 +253,25 @@ function appendHeader(list_id,items,title) {
 		.style("color","#ffffff");
 }
 
+function getItemTime(item) {
+	switch(item.type) {
+		case "track":
+			return getTimeString(item.duration_ms);
+		default:
+			return "";			
+	}
+}
+
+function getTimeString(milliseconds) {
+
+	var seconds = parseInt((milliseconds/1000)%60);
+	var minutes = parseInt((milliseconds/60000)%60);
+	
+	if(seconds < 10) {
+		seconds = '0' + seconds;
+	}
+	return minutes + ":" + seconds;
+}
 /********************************************************/
 /* FUNCTIONS FOR ADDING VISUALIZATIONS TO MIDDLE COLUMN */
 /********************************************************/

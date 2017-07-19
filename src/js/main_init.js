@@ -59,9 +59,17 @@ var timeRange = "short_term";
 var footer; // footer of page 
 var content_pane; // content pane of page 
 var display_name; // use's display name for website 
+
 var shortTermBtn; // term buttons for history
 var mediumTermBtn;
 var longTermBtn;
+
+var userPlaylistsButton,
+	userTopTracksButton,
+	userSelectedSongsButton,
+	userTopArtistsButton,
+	userGraphButton,
+	aboutButton;
 
 init(); // go!  
 
@@ -80,39 +88,39 @@ async function init() {
 	await getData();
 
 	// add listener to user playlists nav bar button 				
-  	var userPlaylistsButton = d3.select('#user_playlists')
-                    .on("click",function() {
-						initPlaylistPane(100);
-					});
+  	userPlaylistsButton = d3.select('#user_playlists')
+   	userPlaylistsButton.on("click",function() {
+		initPlaylistPane(100);
+	});
 
 	// add listener to user top songs nav bar button 				
-	var userTopSongsButton = d3.select('#user_top_songs')
-                    .on("click",function() {
-						initTrackPane(100);
-                    });
+	userTopTracksButton = d3.select('#user_top_songs');
+    userTopTracksButton.on("click",function() {
+		initTrackPane(100);
+    });
 
 	// add listener to user selected songs nav bar button 				
-  	var userSelectedSongsButton = d3.select('#user_selected_songs')
-                    .on("click",function() {
-						initSelectedSongsPane(100);
-                    });
+  	userSelectedSongsButton = d3.select('#user_selected_songs');
+    userSelectedSongsButton.on("click",function() {
+		initSelectedSongsPane(100);
+    });
 
 	// add listener to user artists nav bar button 				
-  	var userTopArtistsButton = d3.select('#user_top_artists')
-                    .on('click', function() {
-						initArtistPane(100);
-					});
+  	userTopArtistsButton = d3.select('#user_top_artists');
+    userTopArtistsButton.on('click', function() {
+		initArtistPane(100);
+	});
 
 	// add listener to user graph nav bar button 				
-  	var userGraphButton = d3.select('#user_graph')
-                    .on('click', function() {  						
-						initGraphPane(100);
-                    });
+  	userGraphButton = d3.select('#user_graph');
+    userGraphButton.on('click', function() {  						
+		initGraphPane(100);
+    });
 	// add listener to about navbar option 
-  	var about = d3.select('#about')
-                    .on('click', function() {
-						initAboutPane();
-	                });
+  	aboutButton = d3.select('#about');
+    aboutButton.on('click', function() {
+		initAboutPane();
+	});
 
 	// default init to the graph pane	
 	$("#content_pane").empty();
@@ -266,14 +274,25 @@ function initGraphOnStart() {
 		$('#loading_modal').modal("hide");	
 
 	} else {
+
+		userGraphButton.remove();
+		userPlaylistsButton.remove();
+		userSelectedSongsButton.remove();
+		userTopArtistsButton.remove();
+		userTopTracksButton.remove();
+
 		initAboutPane();
 		var header = d3.select("#modal_header");
 		header.selectAll('*').remove();
-		header.text('Oops, we ran into an issue!');
+		header.append('div').html('<strong><h2>Oops, we ran into an issue!</h2></strong>');
 
 		var body = d3.select("#modal_body");
 		body.selectAll('*').remove();
-		body.text("There was not enough data to load the visualization. Listen to more music!");
+		body.append('div').html("<strong><h3>There was not enough data to load the visualization.</h3><br>" + 
+					"Two of three things have happened:<br><ul>" +
+					"	<li>(1) You have exceeded the number of allowed API calls to Spotify and are thus cut off " +
+					"			(good job, thanks for using this tool).</li>" +
+					"	<li>(2) You dont listen to enough music for this site to visualize your account :(</li></ul></strong>");
 	}
 }
 
@@ -327,6 +346,7 @@ function showNotification(header, text, duration) {
 }
 
 
+
 /**********************************************/
 /* FUNCITONS FOR INITIALIZING/POPULATING DATA */
 /**********************************************/
@@ -347,14 +367,14 @@ function initTopTracks() {
     	type : "GET",
     	success : function(result) {
       		console.log(result);
+			var tracks = [];
       		for(item of result.items) {
-        		item = item.track;
+        		tracks.push(item.track);
       		}
-      		result.items.reverse();
+      		tracks.reverse();
             userTopTracks.type = "tracks";
-      		userTopTracks.items = result.items;
+      		userTopTracks.items = tracks;
 			setTypes(userTopTracks.items, "track");
-      		//addItems(result);
     	}
   	});
 };
@@ -377,8 +397,8 @@ function initTopArtists() {
       		console.log(result);
             userTopArtists.type = "artists";
 			userTopArtists.genres = getGenreBreakdown(result.items);
-			setTypes(userTopArtists.items, "artist");
       		userTopArtists.items = result.items;
+			setTypes(userTopArtists.items, "artist");
     	}
   	});
 };

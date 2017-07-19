@@ -108,22 +108,23 @@
 .left-hand-list-view {
 	width: 100% !important;
 	overflow: scroll !important;
-	padding: 8px 8px 8px 8px;	
-	margin-bottom: 15px;
+  	margin: 15px 0px 15px 0px;
+	list-style-type: none;
 	border-right: solid 3px #828282;
 	border-block-end-style: ridge;
-	list-style-type: none;
+	align-content: center;
+	overflow-x: hidden;
+	overflow-y: hidden;
 }
 
 .right-hand-list-view {
 	width: 100% !important;
 	overflow: scroll !important;
-  	list-style-type: none;
-
+  	margin: 15px 0px 15px 0px;
+	list-style-type: none;
 	border-left: solid 3px #828282;
 	border-block-end-style: ridge;
 	align-content: center;
-
 	overflow-x: hidden;
 	overflow-y: hidden;
 }
@@ -148,12 +149,12 @@
 .list-item {
 	width: 90%;
 	height: 40px;
-	margin: 10px 10px 10px 15px;
-	padding: 10px 10px 10px 10px;
-	border: 2px solid #363636;
-	border-radius: 12px;
-	color: white;
+	margin: 0px 10px 0px 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #595959;
 
+	color: #EEEEEE;
 	vertical-align: center;
 }
 
@@ -189,11 +190,10 @@ html {
 }
 
 .li-child {
-	font-size: 18px !important;
+	font-size: 16px !important;
 	margin-left: 15px;
 	margin-top: auto;
 	margin-bottom: auto;
-	vertical-align: center;
 }
 
 .exp-well {
