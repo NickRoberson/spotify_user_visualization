@@ -284,15 +284,25 @@ function initGraphOnStart() {
 		initAboutPane();
 		var header = d3.select("#modal_header");
 		header.selectAll('*').remove();
-		header.append('div').html('<strong><h2>Oops, we ran into an issue!</h2></strong>');
+		header.append('div').html('<strong><h2>Oops, we ran into an issue!<i class=\"fa fa-frown-o fa-lg\" style=\"float:right\"></i></h2></strong>');
 
 		var body = d3.select("#modal_body");
 		body.selectAll('*').remove();
-		body.append('div').html("<strong><h3>There was not enough data to load the visualization.</h3><br>" + 
+		body.append('div').html("<strong><h3>There wasn't enough data to load the visualization.</h3><br>" + 
 					"Two of three things have happened:<br><ul>" +
-					"	<li>(1) You have exceeded the number of allowed API calls to Spotify and are thus cut off " +
-					"			(good job, thanks for using this tool).</li>" +
-					"	<li>(2) You dont listen to enough music for this site to visualize your account :(</li></ul></strong>");
+					"	<li>(1) This site exceeded the number of allowed API calls to the Spotify API and cant make any more " +
+					"			(good job though, thanks for using this tool!).</li>" +
+					"	<li>(2) You don't listen to enough music for this site to visualize your account :(</li></ul><br>" +
+					"In the meantime check out the album Broken Bells by Broken Bells. Its just long enough (37 minutes) " +
+					"to let the API call count reset. It's also one of my favorite albums.");
+
+		body.append('iframe')
+						.attr("id","iframe_footer")
+						.attr("src","https://open.spotify.com/embed?uri=spotify:album:0X7WyEKdm5afGj1fmD7Blx")
+						.attr("height", "80px")
+						.attr("width", "100%")
+						.attr("frameborder","0")
+						.attr("allowtransparency","true");
 	}
 }
 
