@@ -166,7 +166,8 @@ function appendItems(list_id, items) {
 	var list_area = d3.select(id);
 	// make it so if this is a song when you double click on it 
 	// the option to add it to the list of selectedSongs for the user.
-    var items = list_area.selectAll('list_item')
+    
+	var items = list_area.selectAll('list_item')
 			.data(items)
 			.enter()
 				.append('li')
@@ -175,12 +176,12 @@ function appendItems(list_id, items) {
 					return 'item_' + d.id;
 				})
 				.on("mouseover", d => {
-					d3.select('item_' + d.id).style("background", "#363636");
+					d3.select('item_' + d.id).style("color", "#84bd00");
 					d3.select('#play_' + d.id).style('color','#696969');
 					//d3.select('#plus_' + d.id).style('color','#696969');
 				})
 				.on("mouseout", d => {
-					d3.select('item_' + d.id).style("background", "#000000");
+					d3.select('item_' + d.id).style("color", "#FFFFFF");
 					d3.select('#play_' + d.id).style('color','#000000');
 					//d3.select('#plus_' + d.id).style('color','#000000');
 				});	
@@ -199,7 +200,7 @@ function appendItems(list_id, items) {
 			});
 
 	items.append('i')
-			.attr('class','fa fa-plus fa-2x li-child')
+			.attr('class','fa fa-plus fa-4x li-child')
 			.attr('aria-hidden', true)
 			.style('color','#696969')
 			.style('float','left')
@@ -216,7 +217,7 @@ function appendItems(list_id, items) {
 			.attr('class','li-child')
 			.style('float','left')
 			.text(d => {
-				return d.name;
+				return getItemTitle(d);
 			});
 
 	items.append('html')
@@ -224,7 +225,7 @@ function appendItems(list_id, items) {
 			.style('float','right')
 			.style('margin-right','15px')
 			.text(d => {
-				return getItemTime(d);
+				return getItemFeature(d);
 			});
 }
 
@@ -253,10 +254,14 @@ function appendHeader(list_id,items,title) {
 		.style("color","#ffffff");
 }
 
-function getItemTime(item) {
+function getItemFeature(item) {
 	switch(item.type) {
 		case "track":
 			return getTimeString(item.duration_ms);
+		case "artist":
+			return item.popularity;
+		case "playlist":
+			return item.tracks.total;
 		default:
 			return "";			
 	}
@@ -271,6 +276,14 @@ function getTimeString(milliseconds) {
 		seconds = '0' + seconds;
 	}
 	return minutes + ":" + seconds;
+}
+
+function getItemTitle(d) {
+	if(d.name.length > 30) {
+		return d.name.substring(0,25) + " . . .";
+	} else {
+		return d.name;
+	}
 }
 /********************************************************/
 /* FUNCTIONS FOR ADDING VISUALIZATIONS TO MIDDLE COLUMN */
@@ -340,8 +353,12 @@ function addGenreBarChart(genres) {
 
 // code to make bar chart of genres for users artists
 function update_plot(genres) {
+	var genre_total = 0;
+	for (var val in Object.values(genres)) {
+		genre_total += val;
+	}
     // Update our yscale
-    yscale.domain([0, Math.max(0.01, d3.max(Object.values(word_counts)) / tweet_count)])
+    yscale.domain([0, Math.max(0.01, d3.max(Object.values(genres)) / genre_total)])
           .nice();
 
     // Re-generate the y axis with our new y scale
@@ -364,8 +381,8 @@ function update_plot(genres) {
         .merge(join) // Update *all* rects to be the right height, but use a transition
          	.transition().duration(500)
          	// Move the bar down 0.5 so the bar outline overlaps the axis line
-          	.attr('y', d => yscale(d.value / tweet_count) + 0.5)
-          	.attr('height', d => yscale(0) - yscale(d.value / tweet_count))
+          	.attr('y', d => yscale(d.value / genre_total) + 0.5)
+          	.attr('height', d => yscale(0) - yscale(d.value / genre_total))
 			.on('click', d => listGenreTopSongs(d.key));
 }
 
@@ -373,12 +390,6 @@ function update_plot(genres) {
 /********************************/
 /* FUNCTIONS FOR CLICK HANDLERS */
 /********************************/
-
-function listGenreTopSongs(genre) {
-	// Here we take the genre that is passed and append a list view with the 
-	// top songs from a genre inside of it to the right of the bar graph with 
-	// the users genre breakdown.
-}
 
 function play(d) {	
 	try {
