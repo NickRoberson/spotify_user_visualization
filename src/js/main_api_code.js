@@ -65,25 +65,29 @@ function appendArtistsTopTracks(list_id, artist_id, artist_name) {
 /***************************/
 
 function getPlaylistSongs(playlist) {
-	var playlist_id = playlist.id;
-  	var call_url = "https://api.spotify.com/v1/users/" + user.id + "/playlists/" + playlist_id + "/tracks";
-  	$.ajax({
-  		url: call_url,
-    	headers: {
-      		'Authorization': 'Bearer ' + access_token
-    	},
-    	dataType: "json",
-    	type : "GET",
-    	success : function(result) {
-      		console.log(result);
-			
+	console.log(user);
+	var call_url = "https://api.spotify.com/v1/users/" + playlist.owner.id + "/playlists/" + playlist.id + "/tracks";
+	console.log(call_url + " : " + access_token);
+	$.ajax({
+		url: call_url,
+		headers: {
+			'Authorization': 'Bearer ' + access_token
+		},
+		dataType: "json",
+		type : "GET",
+		success : function(result) {
+			console.log(result);
 			userPlaylists.currentPlaylist = playlist;
-            userPlaylists.currentPlaylist.type = "playlist";
+			userPlaylists.currentPlaylist.type = "playlist";
 			userPlaylists.currentPlaylist.genres = getGenreBreakdown(result.items);
-			userPlaylists.currentPlaylist.items = result.items;
+			// add items to current playlist
+			userPlaylists.currentPlaylist.items = [];
+			result.items.forEach(function(item) {
+			userPlaylists.currentPlaylist.items.push(item.track);
+			});
 			setTypes(userPlaylists.currentPlaylist.items, "track");
-    	}
-  	});
+		}
+	});
 };
 
 /***********/

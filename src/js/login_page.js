@@ -1,12 +1,14 @@
 var client_id = "85f22cf5c62d45a5850c744d876fc4a0";
 var client_secret = "ee25f76fe69e4418adbf136ac8dfce32";
 var redirect_uri = "http://localhost:8000/src/html/main_views/login_page.html";
-var scopes = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative user-top-read user-library-modify user-library-read';
+var scopes = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private user-top-read user-library-modify user-library-read';
 var base_url = 'https://accounts.spotify.com/authorize';
 var url;
 var stateKey = 'spotify_auth_state';
 
 console.log("login_page.js running currently . . .");
+
+authorize_user();
 
 function authorize_user() {
 	var params = getHashParams();
@@ -51,8 +53,6 @@ function authorize_user() {
   		console.log(url);
 	}
 };
-
-authorize_user();
 
 // called when login button is set
 function login() {

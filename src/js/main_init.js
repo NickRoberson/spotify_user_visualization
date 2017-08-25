@@ -3,7 +3,7 @@
 /********************/
 
 // Device data 
-var colHeight = (screen.height * .7 - 80) + "px";
+var colHeight = "65";
 
 // User data
 var access_token;
@@ -28,7 +28,10 @@ var userPlaylists = {
 	items: [],
 	type: "playlists",
 	currentPlaylist: {}
-}; // user's playlists
+}; 
+userPlaylists.currentPlaylist.items = [];
+userPlaylists.currentPlaylist.genres = []; // user's playlists
+
 var userCurrentPlaylist = {}; // user's current selected playlist 
 
 var userTopTracks = {
@@ -51,7 +54,8 @@ var userSelectedSongs = {
 var graph = {
 	nodes: [],
 	links: []
-}; // User graph
+}; 
+var simulation; // User graph
 
 var timeRange = "short_term";
 
@@ -127,7 +131,7 @@ async function init() {
 	$("#content_pane").load("/src/html/secondary_views/user_graph.html", function() {
 		setTimeout(function() {
 			initGraphOnStart();
-		}, 1500)
+		}, 1500);
 	}); 	
 	console.log("Finished initialization.");
 
@@ -188,7 +192,7 @@ function initAboutPane() {
 function initGraphPane() {		
 	$("#content_pane").empty();
 	$("#content_pane").load("/src/html/secondary_views/user_graph.html", function() {
-		setUISize(["right_hand_list"]);
+		setUISizeGraph(['right_hand_list'],"50");
 		initGraph(graph);
 		appendArtistsTopTracks("right_hand_list",
 							userTopArtists.items[0].id,
@@ -201,9 +205,15 @@ function initGraphPane() {
 /*****************************************/
 
 // set the size of the columns based on the size of the screen we are on 
-function setUISize(ids, percent) {
+function setUISize(ids) {
 	ids.forEach(function(id) {
-		d3.select("#" + id).style('height', colHeight);
+		d3.select("#" + id).style('height', colHeight + "vh");
+	}, this);
+}
+
+function setUISizeGraph(ids, h) {
+	ids.forEach(function(id) {
+		d3.select("#" + id).style('height', h + "vh");
 	}, this);
 }
 
@@ -231,8 +241,8 @@ function initUserInformation() {
 function initHTMLElements() {
 	// set list area for listing songs and such 
 	content_pane = d3.select('#content_pane');
-	content_pane.attr("height", (screen.height)*.8 + "px")
-				.attr("width",  screen.width + "px");
+	content_pane.attr("height", "80vh")
+				.attr("width",  "100vw");
 				//.style("border","solid 3px #474747")
 				//.style("border-radius","5px");
 
@@ -266,7 +276,7 @@ function initGraphOnStart() {
 	   graph.nodes.length >= 30 && 
 	   userPlaylists.items.length >= 50 &&
 	   userTopTracks.items.length >= 50) {
-		setUISize(["right_hand_list"]);
+		setUISizeGraph(["right_hand_list"],50);
 		initGraph();
 		appendArtistsTopTracks("right_hand_list",
 							userTopArtists.items[0].id,
@@ -381,7 +391,6 @@ function initTopTracks() {
       		for(item of result.items) {
         		tracks.push(item.track);
       		}
-      		tracks.reverse();
             userTopTracks.type = "tracks";
       		userTopTracks.items = tracks;
 			setTypes(userTopTracks.items, "track");

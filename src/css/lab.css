@@ -142,8 +142,8 @@
 }
 
 .user-graph-area {
-	width: 75% !important;
-	height: 100% !important;
+	width: 75vw !important;
+	height: 65vh !important;
 }
 
 .list-item {
@@ -213,4 +213,14 @@ html {
 
 .last-well {
 	margin-bottom: 100px;
+}
+
+canvas {
+  width: 100vw;
+  height: 100vh;
+  display: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -9999;
 }

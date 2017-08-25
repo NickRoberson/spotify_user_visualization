@@ -5,6 +5,7 @@
     <title>Spotify Visualization</title>
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="/src/css/lab.css">
+    <link rel="stylesheet" type="text/css" href="/src/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!-- IMPORT BOOTSTRAP -->
@@ -18,7 +19,7 @@
 
   </head>
 
-  <body class="standard-padding login-background">
+  <body class="standard-padding login-background"> 
     <!-- HEADER & BREADCRUMB -->    
     <div class="well well-lg main-well-login-screen">
       
@@ -29,7 +30,7 @@
       </div>
 
       <!-- LOGIN FIELD -->
-      <div class="row bottom-row-login-screen" align="center" >
+     <div class="row bottom-row-login-screen" align="center" >
         <h4 id="message_login_screen" align="center">Login</h4>
         <img align="center" id="user_image" src="" style="display:none; height:70px; width:70px; border-radius:35px; margin-bottom:10px;"><br>
         <button align="center" id="login-button" class="btn btn-default btn-large" onClick="login()">
@@ -40,7 +41,14 @@
 
     </div>
 
+    <!-- background amination -->    
+    <div id="background">  
+      <canvas id="bg-canvas" class="canvas-bg" data-processing-sources="wave.pde">   
+      </canvas> 
+    </div>
+
     <script type="text/javascript" src="/src/js/require/require.js"></script>
     <script type="text/javascript" src="/src/js/login_page.js"></script>
+    <script type="text/javascript" src="/src/processing/processing.js"></script>
   </body>
 </html>

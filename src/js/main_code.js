@@ -1,7 +1,7 @@
 /*********************************/ 
 /* FUNCTIONS FOR USER GRAPH PANE */
 /*********************************/ 
-
+var simulation, node, link;
 function initGraph() {
 	console.log("Displaying graph . . .\n" + "# of Nodes: " + graph.nodes.length + "\n# of Links: " + graph.links.length);
 	console.log(graph);
@@ -12,7 +12,7 @@ function initGraph() {
 
 	var margin = 30;
     var width = screen.width * .75 - margin;
-    var height = screen.height - 100;
+    var height = screen.height * .75;
 
 	// append an svg to the svg area in user_graph.html 
     var graph_area = d3.select('#user_graph_area');
@@ -24,13 +24,13 @@ function initGraph() {
         .attr('height', height)
         .attr('id','graph');
 
-    var simulation = d3.forceSimulation()
+    simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(function(d) {
             return d.id;
         })
-		.distance(30).strength(.2))
+		.distance(30).strength(.3))
         .force("charge", d3.forceManyBody().strength(-100))
-        .force("center", d3.forceCenter(width / 2, height / 2 - 100));
+        .force("center", d3.forceCenter(width / 2, height / 2));
     simulation
 		.nodes(nodes)
     	.on("tick", ticked);
@@ -39,7 +39,7 @@ function initGraph() {
 		.force("link")
     	.links(links);
 
-    var link = svg.append("g")
+    link = svg.append("g")
         .attr("class", "links")
         .selectAll("line")
         .data(links)
@@ -49,7 +49,7 @@ function initGraph() {
 					return Math.sqrt(d.depth*10); 
 				});
 
-    var node = svg.append("g")
+    node = svg.append("g")
         .attr("class", "nodes")
     	.selectAll("circle")
     	.data(nodes)
@@ -61,14 +61,17 @@ function initGraph() {
              		console.log(d.id);
 					if (d.id == user.display_name) { return "#84bd00"; }
              	 	else { return "#686868"; }
-       			});
+				});
 
 
     node.on('click', function(d) {
-			console.log(d);
+			console.log("node single click: " + d.data.id)
 			appendArtistsTopTracks("right_hand_list", d.data.id, d.id);
-			//expandGraph(d.data.id, d.id, d.depth + 1);
         	})
+		.on('dblclick', function(d) {
+			console.log("node double click: " + d.data.id)
+			//expandGraph(d.data.id, d.id, d.depth + 1);
+		})
         .call(d3.drag()
         	.on("start", dragstarted)
         	.on("drag", dragged)
@@ -79,6 +82,20 @@ function initGraph() {
 
     node.append("title")
     	.text(function(d) { return d.id; });
+
+	node.append("image")
+  		.attr("xlink:href", function(d) { return d.data.images[0].url; })
+  		.attr("x", "-12px")
+  		.attr("y", "-12px")
+  		.attr("width", "24px")
+  		.attr("height", "24px");
+
+	node.append("text")
+  		.attr("dy", ".35em")
+  		.attr("x", "13")
+		.style("fill","#474747")
+  		.style("text-anchor",  "start" )
+  		.text(function(d) { return d.data.id; });
 
     function ticked() {
     	link.attr("x1", function(d) { return d.source.x; })
@@ -109,6 +126,48 @@ function initGraph() {
     }
 }
 
+function restartGraph() {
+  // Apply the general update pattern to the nodes.
+  node = node.data(graph.nodes, function(d) { return d.id;});
+  node.exit().remove();
+  node = node.enter().append("circle")
+          	.attr("class", "nodes")
+        	.attr("r", function(d) {
+    	  		return 40 - d.depth*8;
+      		})
+        	.attr("fill", function(d) {
+         		console.log(d.id);
+				if (d.id == user.display_name) { return "#84bd00"; }
+             	else { return "#686868"; }
+       		})
+			.on('click', function(d) {
+				console.log("node single click: " + d.data.id)
+				appendArtistsTopTracks("right_hand_list", d.data.id, d.id);
+        	})
+			.on('dblclick', function(d) {
+				console.log("node double click: " + d.data.id)
+				expandGraph(d.data.id, d.id, d.depth + 1);
+			})
+			.append("title")
+    			.text(function(d) { return d.id; })
+			.merge(node);
+
+  // Apply the general update pattern to the links.
+  link = link.data(graph.links, function(d) { return d.source.id + "-" + d.target.id; });
+  link.exit().remove();
+  link = link.enter().append("line")
+           		.attr('stroke','#444444')
+            	.attr("stroke-width", function(d) { 
+					return Math.sqrt(d.depth*10); 
+				})
+				.merge(link);
+
+  // Update and restart the simulation.
+  simulation.nodes(graph.nodes);
+  simulation.force("link").links(graph.links);
+  simulation.alpha(1).restart();
+}
+
 function expandGraph(artist_id, artist_name, new_depth) {
 	console.log("expandGraph() " + artist_id + " : " + artist_name + " : " + new_depth);
 	var call_url = "https://api.spotify.com/v1/artists/" + artist_id + "/related-artists";
@@ -129,9 +188,9 @@ function expandGraph(artist_id, artist_name, new_depth) {
             		var new_artist = data[i];
             		// make node for new artist
 					// make node for new artist
-					//console.log("new_artist.id = " + new_artist.name);
-					//console.log("new_depth = " + new_depth);
-					//console.log(new_artist);
+					console.log("new_artist.id = " + new_artist.name);
+					console.log("new_depth = " + new_depth);
+					console.log(new_artist);
 
             		new_nodes.push({	'id' : new_artist.name,
                                 		'data' : new_artist,
@@ -145,9 +204,19 @@ function expandGraph(artist_id, artist_name, new_depth) {
         	}
      	 }
     });
-
 	console.log(new_nodes);
 	console.log(new_links);
+	// wait and remake graph
+	setTimeout(function() {
+		// push new nodes and links
+		for(var link in new_links) {
+			graph.links.push(link);
+		}
+		for(var node in new_nodes) {
+			graph.nodes.push(node);
+		}
+		restartGraph();
+	}, 200);
 }
 
 /********************************************************************/ 
@@ -158,6 +227,10 @@ function appendToList(list_id, items, title) {
 	// add header
 	appendHeader(list_id, items, title);
 	// add items 
+	appendItems(list_id,items);
+}
+function clearAndAppendItems(list_id, items) {
+	d3.select("#" + list_id).selectAll('li').remove();
 	appendItems(list_id,items);
 }
 
@@ -227,6 +300,12 @@ function appendItems(list_id, items) {
 			.text(d => {
 				return getItemFeature(d);
 			});
+
+	items.on('dblclick', d => {
+		handleDblClick(d);
+		d3.select('#' + list_id).selectAll('li').style("border","0px");
+		d3.select('#item_' + d.id).style("border", "2px solid #84bd00");
+	})
 }
 
 function appendHeader(list_id,items,title) {
@@ -279,8 +358,9 @@ function getTimeString(milliseconds) {
 }
 
 function getItemTitle(d) {
-	if(d.name.length > 30) {
-		return d.name.substring(0,25) + " . . .";
+	var limit = 25;
+	if(d.name.length > limit) {
+		return d.name.substring(0,limit-2) + "...";
 	} else {
 		return d.name;
 	}
@@ -432,6 +512,29 @@ function addToSelectedList(d) {
 	}
 }
 
+function handleDblClick(d) {
+	switch(d.type) {
+		case "artist":
+			// adds top 10 songs from artist
+			break;
+		case "playlist":
+			getPlaylistSongs(d);
+			setTimeout(function() {
+				console.log(userPlaylists);
+				clearAndAppendItems('right_hand_list', userPlaylists.currentPlaylist.items);
+			}, 200);
+			break;	
+		case "track":
+			// adds single track
+			break;
+		default: 
+			console.log("Added item type is undefined.")
+			console.log(d);
+			break;
+	};
+}
+
+
 function addTrack(track) {
 	console.log("Adding " + track.name + " to selected tracks list.");
 	// add to list 
@@ -454,7 +557,7 @@ function addPlaylist(playlist) {
 			console.log(result);
 			// add to list 
 			result.items.forEach(function(item) {
-				addTrack(item);
+				addTrack(item.track);
 			});
     	}
   	});
