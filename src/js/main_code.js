@@ -515,7 +515,7 @@ function addToSelectedList(d) {
 function handleDblClick(d) {
 	switch(d.type) {
 		case "artist":
-			// adds top 10 songs from artist
+			appendArtistsTopTracks('right_hand_list',d.id,d.name);
 			break;
 		case "playlist":
 			getPlaylistSongs(d);
@@ -525,7 +525,6 @@ function handleDblClick(d) {
 			}, 200);
 			break;	
 		case "track":
-			// adds single track
 			break;
 		default: 
 			console.log("Added item type is undefined.")
